@@ -21,6 +21,7 @@ public class Cutscene1 : MonoBehaviour
 
     IEnumerator Routine()
     {
+        PlayerTransform = GameObject.FindWithTag("Player").transform;
         yield return new WaitForSeconds(1f);
         GodText.text = "º _ º\n\noh hi";
         yield return new WaitForSeconds(3.5f);
