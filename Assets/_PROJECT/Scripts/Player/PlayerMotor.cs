@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using DG.Tweening;
+using DigitalRuby.ThunderAndLightning;
 
 public struct Cmd
 {
@@ -86,6 +87,8 @@ public class PlayerMotor : MonoBehaviour
     private Tweener _dodgeDuckTween;
     private bool _isDashing;
     private float _timeSinceLastDash;
+    private Collider _lastWalljumpCollider;
+    private float _currentWalljumpHeight;
 
     void Awake()
     {
@@ -149,6 +152,7 @@ public class PlayerMotor : MonoBehaviour
         {
             _isGrounded = true;
             _hasJumped = false;
+            _currentWalljumpHeight = WalljumpHeight;
         }
 
         if (IsCeiling(col))
@@ -163,6 +167,7 @@ public class PlayerMotor : MonoBehaviour
         {
             _isGrounded = true;
             _lastCollision = col;
+            _lastWalljumpCollider = null;
         }
 
         if (IsCeiling(col))
@@ -170,12 +175,14 @@ public class PlayerMotor : MonoBehaviour
             _playerVelocity.y -= 1;
         }
 
-        if (IsWall(col) && !_isGrounded && _canDoubleJump && _wishJump && _canJump)
+        if (IsWall(col) && !_isGrounded && _canDoubleJump && _wishJump && _canJump && col.collider != _lastWalljumpCollider)
         {
-            _playerVelocity = ((col.contacts[0].normal + (Vector3.up * WalljumpHeight)) *
+            _lastWalljumpCollider = col.collider;
+            _playerVelocity = ((col.contacts[0].normal + (Vector3.up * _currentWalljumpHeight)) *
                                 Mathf.Clamp(new Vector3(_playerVelocity.x, 0, _playerVelocity.z).magnitude, 0, WalljumpMaxMagnitude));
             _wishJump = false;
             _canJump = false;
+            _currentWalljumpHeight /= 1.25f;
         }
 
         if (Vector3.Dot(col.contacts[0].normal, _playerVelocity) < 0)

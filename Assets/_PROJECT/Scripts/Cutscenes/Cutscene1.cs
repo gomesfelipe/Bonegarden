@@ -1,49 +1,53 @@
 ﻿using UnityEngine;
 using System.Collections;
 using DG.Tweening;
+using TMPro;
 
 public class Cutscene1 : MonoBehaviour
 {
 
-    public TOD_Sky Sky;
+    public TextMeshPro GodText;
+    public Transform CorridorTransform;
+    public Transform PlayerTransform;
+    public Transform StairsTransform;
 
-    private float _rayleigh;
-    private float _mie;
-    private float _contrast;
-    private float _directionality;
+    private bool _hasTriggered;
+    private Transform _textLookatTransform;
 
-    // Use this for initialization
     void Awake()
     {
-        _rayleigh = Sky.Atmosphere.RayleighMultiplier;
-        _mie = Sky.Atmosphere.MieMultiplier;
-        _contrast = Sky.Atmosphere.Contrast;
-        _directionality = Sky.Atmosphere.Directionality;
-
-        Sky.Atmosphere.RayleighMultiplier = 0;
-        Sky.Atmosphere.MieMultiplier = 0.4f;
-        Sky.Atmosphere.Contrast = 6f;
-        Sky.Atmosphere.Directionality = 1f;
-    }
-
-    void Start()
-    {
-        StartCoroutine(Routine());
-    }
-
-    float GetDirection()
-    {
-        return Sky.Atmosphere.Directionality;
-    }
-
-    void SetDirection(float value)
-    {
-        Sky.Atmosphere.Directionality = value;
+        _textLookatTransform = GodText.transform.parent;
     }
 
     IEnumerator Routine()
     {
-        yield return new WaitForSeconds(5f);
-        DOTween.To(GetDirection, SetDirection, 0.72f, 8f);
+        yield return new WaitForSeconds(1f);
+        GodText.text = "º _ º\n\noh hi";
+        yield return new WaitForSeconds(3.5f);
+        GodText.text = "º _ º\n\nyou've arrived.";
+        yield return new WaitForSeconds(2.5f);
+        GodText.text = "º _ º\n\n";
+        yield return new WaitForSeconds(1f);
+        GodText.text = "º _ º\n\nthis way.";
+        yield return new WaitForSeconds(1f);
+        CorridorTransform.DOLocalMoveY(30f, 2f).SetEase(Ease.Linear).OnComplete(delegate
+        {
+            CorridorTransform.DOLocalMoveY(34f, 2f).SetEase(Ease.OutElastic).OnComplete(delegate
+            {
+                GodText.text = "º _ º\n\n";
+                StairsTransform.DOLocalRotate(new Vector3(90, 0, 0), 2f, RotateMode.LocalAxisAdd).SetEase(Ease.InOutSine);
+            });
+        });
+    }
+
+    void Update()
+    {
+        if (GodText.renderer.isVisible && !_hasTriggered)
+        {
+            _hasTriggered = true;
+            StartCoroutine(Routine());
+        }
+
+        _textLookatTransform.LookAt(PlayerTransform);
     }
 }
