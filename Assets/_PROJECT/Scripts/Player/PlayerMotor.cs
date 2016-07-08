@@ -45,7 +45,12 @@ public class PlayerMotor : MonoBehaviour
     public float JumpSpeed = 210f;
     public float MoveScale = 1f;
     public float JumpGracePeriod = 0.5f;
+    [Header("Roll params")]
+    public Ease RollEaseMode = Ease.OutQuad;
+    public int RollStaminaConsumption;
+
     [Header("Dodge params")]
+    public int DodgeStaminaConsumption = 45;
     public float DodgeSpeed = 10f;
     public float DodgeHeight = 0.4f;
     public float DodgeFovIncrease = 15f;
@@ -64,6 +69,7 @@ public class PlayerMotor : MonoBehaviour
     [Range(0, 1)]
     public float WalljumpHeight;
     public float WalljumpMaxMagnitude;
+    public int WalljumpStaminaConsumption;
 
 
     private Transform _transform;
@@ -89,6 +95,7 @@ public class PlayerMotor : MonoBehaviour
     private float _timeSinceLastDash;
     private Collider _lastWalljumpCollider;
     private float _currentWalljumpHeight;
+    private PlayerStamina _stamina;
 
     void Awake()
     {
@@ -96,6 +103,7 @@ public class PlayerMotor : MonoBehaviour
         _mouse = GetComponent<PlayerMouseLook>();
         _rb = GetComponent<Rigidbody>();
         _input = GetComponent<PlayerInput>();
+        _stamina = GetComponent<PlayerStamina>();
         _camera = CameraTransform.GetComponent<Camera>();
         _camera.fieldOfView = CameraFOV;
 
@@ -175,7 +183,7 @@ public class PlayerMotor : MonoBehaviour
             _playerVelocity.y -= 1;
         }
 
-        if (IsWall(col) && !_isGrounded && _canDoubleJump && _wishJump && _canJump && col.collider != _lastWalljumpCollider)
+        if (IsWall(col) && !_isGrounded && _canDoubleJump && _wishJump && _canJump && col.collider != _lastWalljumpCollider && _stamina.ConsumeStamina(WalljumpStaminaConsumption))
         {
             _lastWalljumpCollider = col.collider;
             _playerVelocity = ((col.contacts[0].normal + (Vector3.up * _currentWalljumpHeight)) *
@@ -579,7 +587,7 @@ public class PlayerMotor : MonoBehaviour
             {
                 if (_hasJumped && _canDoubleJump)
                 {
-                    if (_playerVelocity.magnitude > 0)
+                    if (new Vector2(_playerVelocity.x, _playerVelocity.z).magnitude > 0 && _stamina.ConsumeStamina(RollStaminaConsumption))
                     {
                         Vector3 dir = HeadTransform.InverseTransformDirection(_playerVelocity.normalized);
 
@@ -616,7 +624,7 @@ public class PlayerMotor : MonoBehaviour
                         LowerCollider.enabled = false;
                         Sway.ExternalVector = new Vector2(sideFlip, frontFlip);
                         CameraTransform.DOLocalRotate(new Vector3(360 * frontFlip, 0, 360 * sideFlip), 0.75f, RotateMode.LocalAxisAdd)
-                            .SetEase(Ease.OutQuad)
+                            .SetEase(RollEaseMode)
                             .OnComplete(
                                 delegate
                                 {
@@ -630,7 +638,7 @@ public class PlayerMotor : MonoBehaviour
             else if (!_isDucking && !_isDashing && Time.time > _timeSinceLastDash + DodgeTimeInterval)
             {
                 Vector3 dir = new Vector3(cmd.Movement.x, 0, cmd.Movement.y).normalized;
-                if (dir != Vector3.zero)
+                if (dir != Vector3.zero && _stamina.ConsumeStamina(DodgeStaminaConsumption))
                 {
                     SlopeFix(HeadTransform.TransformDirection(dir) * DodgeSpeed);
                     _timeSinceLastDash = Time.time;
