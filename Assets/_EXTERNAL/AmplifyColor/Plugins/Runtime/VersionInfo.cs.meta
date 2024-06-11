@@ -1,5 +1,7 @@
 fileFormatVersion: 2
 guid: 5e5b349ef10703d459eecdd138c96ea7
+timeCreated: 1432119206
+licenseType: Store
 MonoImporter:
   serializedVersion: 2
   defaultReferences: []
@@ -8,3 +10,10 @@ MonoImporter:
   userData: 
   assetBundleName: 
   assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 1894
+  packageName: Amplify Color
+  packageVersion: 1.8.2
+  assetPath: Assets/AmplifyColor/Plugins/Runtime/VersionInfo.cs
+  uploadId: 369128

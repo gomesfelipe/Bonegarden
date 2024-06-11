@@ -1,28 +1,23 @@
 using UnityEngine;
 
-[RequireComponent(typeof(AudioSource))]
-public class TOD_AudioAtNight : MonoBehaviour
+public class TOD_AudioAtNight : TOD_Audio
 {
 	public  float fadeTime = 1;
 	private float lerpTime = 0;
 
-	private AudioSource audioComponent;
-	private float audioVolume;
+	private float maxVolume;
 
 	protected void Start()
 	{
-		audioComponent = GetComponent<AudioSource>();
-		audioVolume    = audioComponent.volume;
-
-		audioComponent.enabled = TOD_Sky.Instance.IsNight;
+		maxVolume = GetVolume();
+		SetVolume(TOD_Sky.Instance.IsDay ? maxVolume : 0);;
 	}
 
 	protected void Update()
 	{
-		int sign = (TOD_Sky.Instance.IsNight) ? +1 : -1;
+		int sign = (TOD_Sky.Instance.IsDay) ? +1 : -1;
 		lerpTime = Mathf.Clamp01(lerpTime + sign * Time.deltaTime / fadeTime);
 
-		audioComponent.volume  = Mathf.Lerp(0, audioVolume, lerpTime);
-		audioComponent.enabled = (audioComponent.volume > 0);
+		SetVolume(Mathf.Lerp(0, maxVolume, lerpTime));
 	}
 }

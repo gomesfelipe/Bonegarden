@@ -46,6 +46,27 @@ public class TOD_WeatherManager : MonoBehaviour
 	private float atmosphereBrightness;
 	private float rainEmission;
 
+	private float GetRainEmission()
+	{
+		if (RainParticleSystem)
+		{
+			return RainParticleSystem.emission.rateOverTimeMultiplier;
+		}
+		else
+		{
+			return 0;
+		}
+	}
+
+	private void SetRainEmission(float value)
+	{
+		if (RainParticleSystem)
+		{
+			var emission = RainParticleSystem.emission;
+			emission.rateOverTimeMultiplier = value;
+		}
+	}
+
 	protected void Start()
 	{
 		var sky = TOD_Sky.Instance;
@@ -56,7 +77,7 @@ public class TOD_WeatherManager : MonoBehaviour
 		cloudBrightness      = sky.Clouds.Brightness;
 		atmosphereFog        = sky.Atmosphere.Fogginess;
 		atmosphereBrightness = sky.Atmosphere.Brightness;
-		rainEmission         = RainParticleSystem ? RainParticleSystem.emissionRate : 0;
+		rainEmission         = GetRainEmission();
 
 		// Get maximum values
 		cloudOpacityMax         = cloudOpacity;
@@ -143,7 +164,7 @@ public class TOD_WeatherManager : MonoBehaviour
 		}
 
 		// FadeTime is not exact as the fade smoothens a little towards the end
-		float t = Time.deltaTime / FadeTime;
+		float t = FadeTime > 0.0f ? Mathf.Clamp01(Time.deltaTime / FadeTime) : 1.0f;
 
 		// Update visuals
 		sky.Clouds.Opacity        = Mathf.Lerp(sky.Clouds.Opacity,        cloudOpacity,         t);
@@ -152,9 +173,6 @@ public class TOD_WeatherManager : MonoBehaviour
 		sky.Atmosphere.Fogginess  = Mathf.Lerp(sky.Atmosphere.Fogginess,  atmosphereFog,        t);
 		sky.Atmosphere.Brightness = Mathf.Lerp(sky.Atmosphere.Brightness, atmosphereBrightness, t);
 
-		if (RainParticleSystem)
-		{
-			RainParticleSystem.emissionRate = Mathf.Lerp(RainParticleSystem.emissionRate, rainEmission, t);
-		}
+		SetRainEmission(Mathf.Lerp(GetRainEmission(), rainEmission, t));
 	}
 }

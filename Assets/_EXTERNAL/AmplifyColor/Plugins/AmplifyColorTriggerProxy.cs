@@ -1,14 +1,14 @@
-﻿using UnityEngine;
+// Amplify Color - Advanced Color Grading for Unity
+// Copyright (c) Amplify Creations, Lda <info@amplify.pt>
+
+using UnityEngine;
 using System.Collections;
 
 [RequireComponent( typeof( Rigidbody ) )]
 [RequireComponent( typeof( SphereCollider ) )]
 [AddComponentMenu( "" )]
-public class AmplifyColorTriggerProxy : MonoBehaviour
+public class AmplifyColorTriggerProxy : AmplifyColorTriggerProxyBase
 {
-	public Transform Reference;
-	public AmplifyColorBase OwnerEffect;
-
 	private SphereCollider sphereCollider;
 	private Rigidbody rigidBody;
 
@@ -26,6 +26,6 @@ public class AmplifyColorTriggerProxy : MonoBehaviour
 	void LateUpdate()
 	{
 		transform.position = Reference.position;
-		transform.rotation = Reference.rotation;		
+		transform.rotation = Reference.rotation;
 	}
 }

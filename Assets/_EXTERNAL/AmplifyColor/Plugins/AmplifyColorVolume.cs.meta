@@ -4,7 +4,11 @@ MonoImporter:
   serializedVersion: 2
   defaultReferences: []
   executionOrder: 0
-  icon: {instanceID: 0}
-  userData: 
-  assetBundleName: 
-  assetBundleVariant: 
+  icon: {fileID: 2800000, guid: 7662ff3b3eb367545b8e4f8c9dd17802, type: 3}
+AssetOrigin:
+  serializedVersion: 1
+  productId: 1894
+  packageName: Amplify Color
+  packageVersion: 1.8.2
+  assetPath: Assets/AmplifyColor/Plugins/AmplifyColorVolume.cs
+  uploadId: 369128

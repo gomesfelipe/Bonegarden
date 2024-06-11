@@ -1,4 +1,4 @@
-﻿//
+//
 // (c) 2016 Digital Ruby, LLC
 // http://www.digitalruby.com
 // Code may not be redistributed in source form!
@@ -132,6 +132,11 @@ namespace DigitalRuby.ThunderAndLightning
         /// </summary>
         private const float splineEpsilon = 0.0001f;
 
+        /// <summary>
+        /// Optimized square root
+        /// </summary>
+        /// <param name="x">Value</param>
+        /// <returns>Square root of value</returns>
         public static float SquareRoot(float x)
         {
 
@@ -361,7 +366,7 @@ namespace DigitalRuby.ThunderAndLightning
         /// <param name="ctr1">Control point 1</param>
         /// <param name="ctr2">Control point 2</param>
         /// <param name="numberOfSegments">Number of segments. The higher this number, the more points are sampled.</param>
-        /// <param name="t">Start t. This can be the return value of a previous call to maintain a smooth path.</param>
+        /// <param name="startT">Start t. This can be the return value of a previous call to maintain a smooth path.</param>
         /// <returns>Leftover t. This can be passed back in to startT to continue a path smoothly.</returns>
         public static float CreateCurve(ICollection<Vector3> path, Vector3 start, Vector3 end, Vector3 ctr1, Vector3 ctr2, int numberOfSegments, float startT)
         {

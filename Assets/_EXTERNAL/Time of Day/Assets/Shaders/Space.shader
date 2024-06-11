@@ -1,5 +1,3 @@
-// Upgrade NOTE: replaced '_Object2World' with 'unity_ObjectToWorld'
-
 Shader "Time of Day/Space"
 {
 	Properties
@@ -15,19 +13,21 @@ Shader "Time of Day/Space"
 	uniform samplerCUBE _CubeTex;
 	uniform float _Brightness;
 
-	struct v2f {
+	struct v2f
+	{
 		float4 position : SV_POSITION;
 		float4 viewdir  : TEXCOORD0;
 	};
 
-	v2f vert(appdata_base v) {
+	v2f vert(appdata_base v)
+	{
 		v2f o;
 
 		o.position = TOD_TRANSFORM_VERT(v.vertex);
 
 		float3 vertnorm = normalize(v.vertex.xyz);
 
-		float3 worldNormal = normalize(mul((float3x3)unity_ObjectToWorld, vertnorm));
+		float3 worldNormal = normalize(mul((float3x3)TOD_Object2World, vertnorm));
 
 		o.viewdir.xyz = vertnorm;
 		o.viewdir.w   = saturate(_Brightness * TOD_StarVisibility * worldNormal.y);
@@ -35,8 +35,11 @@ Shader "Time of Day/Space"
 		return o;
 	}
 
-	half4 frag(v2f i) : COLOR {
-		return half4(texCUBE(_CubeTex, i.viewdir.xyz).rgb * i.viewdir.w, 1);
+	half4 frag(v2f i) : COLOR
+	{
+		half3 color = texCUBE(_CubeTex, i.viewdir.xyz).rgb * i.viewdir.w;
+
+		return half4(color, 0);
 	}
 	ENDCG
 

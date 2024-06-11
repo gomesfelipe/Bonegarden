@@ -1,5 +1,3 @@
-// Upgrade NOTE: replaced '_Object2World' with 'unity_ObjectToWorld'
-
 Shader "Time of Day/Moon"
 {
 	Properties
@@ -14,20 +12,22 @@ Shader "Time of Day/Moon"
 	uniform sampler2D _MainTex;
 	uniform float4 _MainTex_ST;
 
-	struct v2f {
+	struct v2f
+	{
 		float4 position : SV_POSITION;
 		half3  tex      : TEXCOORD0;
 		half3  normal   : TEXCOORD1;
 	};
 
-	v2f vert(appdata_base v) {
+	v2f vert(appdata_base v)
+	{
 		v2f o;
 
 		o.position = TOD_TRANSFORM_VERT(v.vertex);
 
-		o.normal = normalize(mul((float3x3)unity_ObjectToWorld, v.normal));
+		o.normal = normalize(mul((float3x3)TOD_Object2World, v.normal));
 
-		float3 skyPos = mul(TOD_World2Sky, mul(unity_ObjectToWorld, v.vertex)).xyz;
+		float3 skyPos = mul(TOD_World2Sky, mul(TOD_Object2World, v.vertex)).xyz;
 
 		o.tex.xy = TRANSFORM_TEX(v.texcoord, _MainTex);
 		o.tex.z  = skyPos.y * 25;
@@ -35,8 +35,9 @@ Shader "Time of Day/Moon"
 		return o;
 	}
 
-	half4 frag(v2f i) : COLOR {
-		half4 color = half4(TOD_MoonMeshColor, 1);
+	half4 frag(v2f i) : COLOR
+	{
+		half4 color = half4(TOD_MoonMeshColor, 0);
 
 		half alpha = max(0, dot(i.normal, TOD_SunDirection));
 		alpha = saturate(i.tex.z) * TOD_MoonMeshBrightness * pow(alpha, TOD_MoonMeshContrast);

@@ -1,4 +1,4 @@
-// Amplify Color - Advanced Color Grading for Unity Pro
+// Amplify Color - Advanced Color Grading for Unity
 // Copyright (c) Amplify Creations, Lda <info@amplify.pt>
 
 namespace AmplifyColor
@@ -6,16 +6,16 @@ namespace AmplifyColor
 	public class ResolutionSettings
 	{
 		private readonly string[] _resolutionOptions = new[]
-	{
-		//"Game Window",
-		"640x480",
-		"800x600",
-		"1024x768",
-		"1280x720",
-		"1680x1050",
-		"1920x1080",
-		"Custom",
-	};
+		{
+			//"Game Window",
+			"640x480",
+			"800x600",
+			"1024x768",
+			"1280x720",
+			"1680x1050",
+			"1920x1080",
+			"Custom",
+		};
 
 		private int _selectedResolution = 3;
 		private int _targetWidth = 1280;

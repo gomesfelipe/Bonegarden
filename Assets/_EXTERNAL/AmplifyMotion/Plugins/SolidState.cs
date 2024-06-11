@@ -64,7 +64,7 @@ internal class SolidState : AmplifyMotion.MotionState
 			return;
 		}
 
-		Profiler.BeginSample( "Solid.Update" );
+		UnityEngine.Profiling.Profiler.BeginSample( "Solid.Update" );
 
 		if ( !starting && m_wasVisible )
 			m_prevLocalToWorld = m_currLocalToWorld;
@@ -98,12 +98,12 @@ internal class SolidState : AmplifyMotion.MotionState
 
 		m_wasVisible = m_meshRenderer.isVisible;
 
-		Profiler.EndSample();
+		UnityEngine.Profiling.Profiler.EndSample();
 	}
 
 	internal override void RenderVectors( Camera camera, float scale, AmplifyMotion.Quality quality )
 	{
-		Profiler.BeginSample( "Solid.Render" );
+		UnityEngine.Profiling.Profiler.BeginSample( "Solid.Render" );
 
 		if ( m_initialized && !m_error && m_meshRenderer.isVisible )
 		{
@@ -143,7 +143,7 @@ internal class SolidState : AmplifyMotion.MotionState
 			}
 		}
 
-		Profiler.EndSample();
+		UnityEngine.Profiling.Profiler.EndSample();
 	}
 }
 }

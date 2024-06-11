@@ -1,4 +1,4 @@
-// Amplify Color - Advanced Color Grading for Unity Pro
+// Amplify Color - Advanced Color Grading for Unity
 // Copyright (c) Amplify Creations, Lda <info@amplify.pt>
 
 using System;
@@ -281,6 +281,8 @@ namespace AmplifyColor
 					}
 				}
 			}
+
+			lut.Release();
 
 			return true;
 		}

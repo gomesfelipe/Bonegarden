@@ -1,5 +1,7 @@
 fileFormatVersion: 2
 guid: ab75e8f12bda12c46a2124ff051a96cb
+timeCreated: 1428500687
+licenseType: Store
 TextureImporter:
   fileIDToRecycleName: {}
   serializedVersion: 2
@@ -51,3 +53,10 @@ TextureImporter:
   userData: 
   assetBundleName: 
   assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 1894
+  packageName: Amplify Color
+  packageVersion: 1.8.2
+  assetPath: Assets/AmplifyColor/Textures/About.png
+  uploadId: 369128

@@ -136,7 +136,7 @@ internal class ClothState : AmplifyMotion.MotionState
 			return;
 		}
 
-		Profiler.BeginSample( "Cloth.Update" );
+		UnityEngine.Profiling.Profiler.BeginSample( "Cloth.Update" );
 
 		if ( !starting && m_wasVisible )
 			m_prevLocalToWorld = m_currLocalToWorld;
@@ -160,12 +160,12 @@ internal class ClothState : AmplifyMotion.MotionState
 		m_starting = starting;
 		m_wasVisible = isVisible;
 
-		Profiler.EndSample();
+		UnityEngine.Profiling.Profiler.EndSample();
 	}
 
 	internal override void RenderVectors( Camera camera, float scale, AmplifyMotion.Quality quality )
 	{
-		Profiler.BeginSample( "Cloth.Render" );
+		UnityEngine.Profiling.Profiler.BeginSample( "Cloth.Render" );
 
 		if ( m_initialized && !m_error && m_renderer.isVisible )
 		{
@@ -219,7 +219,7 @@ internal class ClothState : AmplifyMotion.MotionState
 			}
 		}
 
-		Profiler.EndSample();
+		UnityEngine.Profiling.Profiler.EndSample();
 	}
 }
 }

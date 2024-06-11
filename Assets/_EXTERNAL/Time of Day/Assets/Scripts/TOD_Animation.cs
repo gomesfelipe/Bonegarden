@@ -6,17 +6,21 @@ using UnityEngine;
 
 public class TOD_Animation : MonoBehaviour
 {
+	/// How much to move the clouds when the camera moves.
+	[Tooltip("How much to move the clouds when the camera moves.")]
+	[TOD_Min(0f)] public float CameraMovement = 1.0f;
+
 	/// Wind direction in degrees.
 	/// 0 for wind blowing in northern direction.
 	/// 90 for wind blowing in eastern direction.
 	/// 180 for wind blowing in southern direction.
 	/// 270 for wind blowing in western direction.
 	[Tooltip("Wind direction in degrees.")]
-	public float WindDegrees = 0.0f;
+	[TOD_Range(0f, 360f)] public float WindDegrees = 0.0f;
 
 	/// Speed of the wind that is acting on the clouds.
 	[Tooltip("Speed of the wind that is acting on the clouds.")]
-	public float WindSpeed = 1.0f;
+	[TOD_Min(0f)] public float WindSpeed = 1.0f;
 
 	/// Current cloud UV coordinates.
 	/// Can be synchronized between multiple game clients to guarantee identical cloud positions.
@@ -31,7 +35,7 @@ public class TOD_Animation : MonoBehaviour
 	{
 		get
 		{
-			var pos = transform.position * 1e-4f;
+			var pos = transform.position * (CameraMovement * 1e-4f);
 			var rot = Quaternion.Euler(0, -transform.rotation.eulerAngles.y, 0);
 			return rot * pos;
 		}

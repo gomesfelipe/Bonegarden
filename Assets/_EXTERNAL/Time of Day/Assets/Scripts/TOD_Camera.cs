@@ -27,7 +27,34 @@ public class TOD_Camera : MonoBehaviour
 
 	public bool HDR
 	{
-		get { return cameraComponent ? cameraComponent.hdr : false; }
+		get
+		{
+			return cameraComponent ? cameraComponent.allowHDR : false;
+		}
+	}
+
+	public float NearClipPlane
+	{
+		get
+		{
+			return cameraComponent ? cameraComponent.nearClipPlane : 0.1f;
+		}
+	}
+
+	public float FarClipPlane
+	{
+		get
+		{
+			return cameraComponent ? cameraComponent.farClipPlane : 1000f;
+		}
+	}
+
+	public Color BackgroundColor
+	{
+		get
+		{
+			return cameraComponent ? cameraComponent.backgroundColor : Color.black;
+		}
 	}
 
 	private Camera cameraComponent = null;
@@ -35,7 +62,7 @@ public class TOD_Camera : MonoBehaviour
 
 	protected void OnValidate()
 	{
-		DomeScaleFactor = Mathf.Clamp(DomeScaleFactor, 0.01f, 3.0f);
+		DomeScaleFactor = Mathf.Clamp(DomeScaleFactor, 0.01f, 1.0f);
 	}
 
 	protected void OnEnable()
@@ -43,11 +70,12 @@ public class TOD_Camera : MonoBehaviour
 		cameraComponent = GetComponent<Camera>();
 		cameraTransform = GetComponent<Transform>();
 
-		if (!sky) sky = FindObjectOfType(typeof(TOD_Sky)) as TOD_Sky;
+		if (!sky) sky = FindSky(true);
 	}
 
 	protected void Update()
 	{
+		if (!sky) sky = FindSky();
 		if (!sky || !sky.Initialized) return;
 
 		sky.Components.Camera = this;
@@ -62,21 +90,29 @@ public class TOD_Camera : MonoBehaviour
 			cameraComponent.backgroundColor = Color.clear;
 		}
 
-		#if UNITY_EDITOR
 		if (RenderSettings.skybox != sky.Resources.Skybox)
-		#endif
 		{
 			RenderSettings.skybox = sky.Resources.Skybox;
+
+			DynamicGI.UpdateEnvironment();
 		}
 	}
 
 	protected void OnPreCull()
 	{
+		if (!sky) sky = FindSky();
 		if (!sky || !sky.Initialized) return;
 
 		if (DomeScaleToFarClip) DoDomeScaleToFarClip();
 
 		if (DomePosToCamera) DoDomePosToCamera();
+	}
+
+	private TOD_Sky FindSky(bool fallback = false)
+	{
+		if (TOD_Sky.Instance) return TOD_Sky.Instance;
+		if (fallback) return FindObjectOfType(typeof(TOD_Sky)) as TOD_Sky;
+		return null;
 	}
 
 	public void DoDomeScaleToFarClip()

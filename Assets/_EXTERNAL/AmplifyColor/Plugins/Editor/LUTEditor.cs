@@ -1,18 +1,13 @@
-// Amplify Color - Advanced Color Grading for Unity Pro
+// Amplify Color - Advanced Color Grading for Unity
 // Copyright (c) Amplify Creations, Lda <info@amplify.pt>
 
 using System.IO;
 using UnityEditor;
 using UnityEngine;
 
-// For Unity3 compatability
-public class LUTEditor : AmplifyColor.LUTEditorInternal
-{
-}
-
 namespace AmplifyColor
 {
-	public class LUTEditorInternal : EditorWindow
+	public class LUTEditor : EditorWindow
 	{
 		public ToolSettings Settings { get { return ToolSettings.Instance; } }
 
@@ -144,6 +139,7 @@ namespace AmplifyColor
 				GUILayout.Label( "3) Make sure both passwords match. Reset them just in case.", EditorStyles.wordWrappedLabel );
 				GUILayout.Label( "4) Add Unity and Photoshop to firewall as exceptions.", EditorStyles.wordWrappedLabel );
 				GUILayout.Label( "5) Set your active Build Target to Standalone.", EditorStyles.wordWrappedLabel );
+				GUILayout.Label( "6) Set Host to target machine; usually 'localhost' or '127.0.0.1'.", EditorStyles.wordWrappedLabel );
 				GUILayout.EndVertical();
 				GUILayout.EndHorizontal();
 			}
@@ -153,12 +149,11 @@ namespace AmplifyColor
 		{
 			EditorGUILayout.Space();
 			EditorGUILayout.Space();
-			EditorGUILayout.LabelField( "", "Save preset to" );
 
 			EditorGUILayout.BeginVertical();
 
 			EditorGUILayout.BeginHorizontal();
-			var lutpath = EditorGUILayout.TextField( "Path", LUTWriter.TexturePath );
+			var lutpath = EditorGUILayout.TextField( "Save Preset to File", LUTWriter.TexturePath );
 
 			if ( GUILayout.Button( "Browse" ) )
 			{
@@ -170,6 +165,7 @@ namespace AmplifyColor
 				}
 			}
 			EditorGUILayout.EndHorizontal();
+			LUTWriter.Overwrite = EditorGUILayout.Toggle( "Overwrite Existing File", LUTWriter.Overwrite );
 
 			//var lutobject = (Texture2D)EditorGUILayout.ObjectField("Texture", LUTWriter.TextureObject, typeof(Texture2D), false);
 
@@ -242,7 +238,8 @@ namespace AmplifyColor
 			ShowGUIResolution();
 
 			Settings.AddLut = EditorGUILayout.Toggle( "Add LUT", Settings.AddLut );
-			Settings.ApplyLUT = EditorGUILayout.Toggle( "Apply effect", Settings.ApplyLUT );
+			Settings.ApplyHDRControl = EditorGUILayout.Toggle( "Apply HDR Control", Settings.ApplyHDRControl );
+			Settings.ApplyColorGrading = EditorGUILayout.Toggle( "Apply Color Grading", Settings.ApplyColorGrading );
 
 			EditorGUILayout.EndVertical();
 			EditorGUILayout.Space();

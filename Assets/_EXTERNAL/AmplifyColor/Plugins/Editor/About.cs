@@ -1,4 +1,4 @@
-// Amplify Color - Advanced Color Grading for Unity Pro
+// Amplify Color - Advanced Color Grading for Unity
 // Copyright (c) Amplify Creations, Lda <info@amplify.pt>
 
 using System;
@@ -14,7 +14,7 @@ namespace AmplifyColor
 		private Vector2 m_scrollPosition = Vector2.zero;
 		private Texture2D m_aboutImage;
 
-		[MenuItem( "Window/Amplify Color/About...", false, 2 )]
+		[MenuItem( "Window/Amplify Color/About...", false, 20 )]
 		static void Init()
 		{
 			About window = ( About ) EditorWindow.GetWindow( typeof( About ) , true , "About Amplify Color" );

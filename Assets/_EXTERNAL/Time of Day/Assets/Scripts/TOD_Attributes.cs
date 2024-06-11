@@ -1,5 +1,7 @@
 using UnityEngine;
+using System;
 
+[AttributeUsage(AttributeTargets.Field, Inherited = true, AllowMultiple = false)]
 public class TOD_MinAttribute : PropertyAttribute
 {
 	public float min;
@@ -10,6 +12,7 @@ public class TOD_MinAttribute : PropertyAttribute
 	}
 }
 
+[AttributeUsage(AttributeTargets.Field, Inherited = true, AllowMultiple = false)]
 public class TOD_MaxAttribute : PropertyAttribute
 {
 	public float max;
@@ -20,6 +23,7 @@ public class TOD_MaxAttribute : PropertyAttribute
 	}
 }
 
+[AttributeUsage(AttributeTargets.Field, Inherited = true, AllowMultiple = false)]
 public class TOD_RangeAttribute : PropertyAttribute
 {
 	public float min;

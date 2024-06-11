@@ -1,4 +1,4 @@
-﻿//
+//
 // Procedural Lightning for Unity
 // (c) 2015 Digital Ruby, LLC
 // Source code may be used for personal or commercial projects.
@@ -11,6 +11,9 @@ using UnityEngine;
 
 namespace DigitalRuby.ThunderAndLightning
 {
+    /// <summary>
+    /// Mesh helper methods
+    /// </summary>
     public class MeshHelper
     {
         private Mesh mesh;
@@ -19,6 +22,10 @@ namespace DigitalRuby.ThunderAndLightning
         private Vector3[] normals;
         private float[] normalizedAreaWeights;
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="mesh">Mesh</param>
         public MeshHelper(Mesh mesh)
         {
             this.mesh = mesh;
@@ -28,12 +35,22 @@ namespace DigitalRuby.ThunderAndLightning
             CalculateNormalizedAreaWeights();
         }
 
+        /// <summary>
+        /// Get random point on mesh
+        /// </summary>
+        /// <param name="hit">Raycast</param>
+        /// <param name="triangleIndex">Received indice</param>
         public void GenerateRandomPoint(ref RaycastHit hit, out int triangleIndex)
         {
             triangleIndex = SelectRandomTriangle();
             GetRaycastFromTriangleIndex(triangleIndex, ref hit);
         }
 
+        /// <summary>
+        /// Get ray dir from indice
+        /// </summary>
+        /// <param name="triangleIndex">Indice</param>
+        /// <param name="hit">Raycast result</param>
         public void GetRaycastFromTriangleIndex(int triangleIndex, ref RaycastHit hit)
         {
             Vector3 bc = GenerateRandomBarycentricCoordinates();
@@ -59,21 +76,33 @@ namespace DigitalRuby.ThunderAndLightning
             }
         }
 
+        /// <summary>
+        /// Mesh
+        /// </summary>
         public Mesh Mesh
         {
             get { return mesh; }
         }
 
+        /// <summary>
+        /// Indices
+        /// </summary>
         public int[] Triangles
         {
             get { return triangles; }
         }
 
+        /// <summary>
+        /// Vertices
+        /// </summary>
         public Vector3[] Vertices
         {
             get { return vertices; }
         }
 
+        /// <summary>
+        /// Normals
+        /// </summary>
         public Vector3[] Normals
         {
             get { return normals; }

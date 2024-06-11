@@ -1,5 +1,7 @@
 fileFormatVersion: 2
-guid: 6c5ad8cd8e5b47c4ebfb585c86a6e4b8
+guid: ec4d675186432d549a3cbf2f61623d49
+timeCreated: 1433276791
+licenseType: Store
 MonoImporter:
   serializedVersion: 2
   defaultReferences: []
@@ -8,3 +10,10 @@ MonoImporter:
   userData: 
   assetBundleName: 
   assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 1894
+  packageName: Amplify Color
+  packageVersion: 1.8.2
+  assetPath: Assets/AmplifyColor/Plugins/Editor/AmplifyColorEffectEditor.cs
+  uploadId: 369128

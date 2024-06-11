@@ -1,5 +1,3 @@
-// Upgrade NOTE: replaced '_Object2World' with 'unity_ObjectToWorld'
-
 Shader "Time of Day/Stars"
 {
 	Properties
@@ -10,13 +8,15 @@ Shader "Time of Day/Stars"
 	#include "UnityCG.cginc"
 	#include "TOD_Base.cginc"
 
-	struct v2f {
+	struct v2f
+	{
 		float4 position : SV_POSITION;
-		half4  color    : COLOR;
+		half3  color    : COLOR;
 		half3  tex      : TEXCOORD0;
 	};
 
-	v2f vert(appdata_full v) {
+	v2f vert(appdata_full v)
+	{
 		v2f o;
 
 		float tanFovHalf = 1.0 / max(0.1, UNITY_MATRIX_P[0][0]); // (r-l) / (2*n)
@@ -35,12 +35,12 @@ Shader "Time of Day/Stars"
 
 		o.position = TOD_TRANSFORM_VERT(v.vertex);
 
-		float3 skyPos = mul(TOD_World2Sky, mul(unity_ObjectToWorld, v.vertex)).xyz;
+		float3 skyPos = mul(TOD_World2Sky, mul(TOD_Object2World, v.vertex)).xyz;
 
 		o.tex.xy = 2.0 * v.texcoord - 1.0;
 		o.tex.z  = skyPos.y * 25;
 
-		o.color = half4(alpha, alpha, alpha, 1);
+		o.color = half3(alpha, alpha, alpha);
 
 #if !TOD_OUTPUT_LINEAR
 		o.color = TOD_LINEAR2GAMMA(o.color);
@@ -49,12 +49,13 @@ Shader "Time of Day/Stars"
 		return o;
 	}
 
-	half4 frag(v2f i) : COLOR {
+	half4 frag(v2f i) : COLOR
+	{
 		half  dist  = length(i.tex.xy);
 		half  spot  = saturate(1.0 - dist);
 		half  alpha = saturate(i.tex.z) * spot;
 
-		return half4(i.color.rgb * alpha, i.color.a);
+		return half4(i.color * alpha, 0);
 	}
 	ENDCG
 

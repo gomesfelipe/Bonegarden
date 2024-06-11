@@ -1,4 +1,4 @@
-// Amplify Color - Advanced Color Grading for Unity Pro
+// Amplify Color - Advanced Color Grading for Unity
 // Copyright (c) Amplify Creations, Lda <info@amplify.pt>
 
 using System;
@@ -346,7 +346,7 @@ namespace AmplifyColor
 				w.Write( SwapEndian( _transactionId++ ) );
 				w.Write( SwapEndian( ImageType ) );
 
-				w.Write( ( byte ) 2 ); 				//imagetype (2 for PixMap);	
+				w.Write( ( byte ) 2 ); 				//imagetype (2 for PixMap);
 				w.Write( SwapEndian( width ) );
 				w.Write( SwapEndian( height ) );
 				w.Write( SwapEndian( width * 3 ) );	//bytesPerScanLine

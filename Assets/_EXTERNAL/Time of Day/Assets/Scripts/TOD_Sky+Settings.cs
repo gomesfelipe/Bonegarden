@@ -252,13 +252,14 @@ public partial class TOD_Sky : MonoBehaviour
 		Shader.SetGlobalFloat(Resources.ID_CloudCoverage,    cloudCoverage);
 		Shader.SetGlobalFloat(Resources.ID_CloudSharpness,   1f / cloudDensity);
 		Shader.SetGlobalFloat(Resources.ID_CloudDensity,     cloudDensity);
+		Shader.SetGlobalFloat(Resources.ID_CloudColoring,    Clouds.Coloring);
 		Shader.SetGlobalFloat(Resources.ID_CloudAttenuation, cloudAttenuation);
 		Shader.SetGlobalFloat(Resources.ID_CloudSaturation,  cloudSaturation);
 		Shader.SetGlobalFloat(Resources.ID_CloudScattering,  Clouds.Scattering);
 		Shader.SetGlobalFloat(Resources.ID_CloudBrightness,  Clouds.Brightness);
 		Shader.SetGlobalVector(Resources.ID_CloudOffset,     Components.Animation.OffsetUV);
 		Shader.SetGlobalVector(Resources.ID_CloudWind,       Components.Animation.CloudUV);
-		Shader.SetGlobalVector(Resources.ID_CloudSize,       new Vector3(Clouds.Size * 2, Clouds.Size, Clouds.Size * 2));
+		Shader.SetGlobalVector(Resources.ID_CloudSize,       new Vector3(Clouds.Size * 4, Clouds.Size, Clouds.Size * 4));
 
 		Shader.SetGlobalFloat(Resources.ID_StarSize,       Stars.Size);
 		Shader.SetGlobalFloat(Resources.ID_StarBrightness, Stars.Brightness);

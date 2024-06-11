@@ -1,4 +1,6 @@
-﻿Shader "Ceto/FoamCopy" 
+﻿// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+
+Shader "Ceto/FoamCopy" 
 {
 	CGINCLUDE
 	
@@ -17,7 +19,7 @@
 	v2f vert(appdata_base v)
 	{
 		v2f OUT;
-		OUT.pos = mul(UNITY_MATRIX_MVP, v.vertex);
+		OUT.pos = UnityObjectToClipPos(v.vertex);
 		OUT.uv = v.texcoord;
 		return OUT;
 	}

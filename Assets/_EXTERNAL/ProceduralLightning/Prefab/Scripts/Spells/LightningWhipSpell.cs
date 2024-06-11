@@ -1,4 +1,4 @@
-﻿//
+//
 // Procedural Lightning for Unity
 // (c) 2015 Digital Ruby, LLC
 // Source code may be used for personal or commercial projects.
@@ -11,24 +11,33 @@ using System;
 
 namespace DigitalRuby.ThunderAndLightning
 {
+    /// <summary>
+    /// Lightning whip spell, think Balrog but with lightning instead of fire
+    /// </summary>
     public class LightningWhipSpell : LightningSpellScript
     {
+        /// <summary>Attach the whip to what object</summary>
         [Header("Whip")]
         [Tooltip("Attach the whip to what object")]
         public GameObject AttachTo;
 
+        /// <summary>Rotate the whip with this object</summary>
         [Tooltip("Rotate the whip with this object")]
         public GameObject RotateWith;
 
+        /// <summary>Whip handle</summary>
         [Tooltip("Whip handle")]
         public GameObject WhipHandle;
 
+        /// <summary>Whip start</summary>
         [Tooltip("Whip start")]
         public GameObject WhipStart;
 
+        /// <summary>Whip spring</summary>
         [Tooltip("Whip spring")]
         public GameObject WhipSpring;
 
+        /// <summary>Whip crack audio source</summary>
         [Tooltip("Whip crack audio source")]
         public AudioSource WhipCrackAudioSource;
 
@@ -91,12 +100,12 @@ namespace DigitalRuby.ThunderAndLightning
             WhipSpring.GetComponent<Rigidbody>().position = whipPositionBackwards;
 
             // wait a bit
-            yield return new WaitForSeconds(springBackwardTime);
+            yield return WaitForSecondsLightning.WaitForSecondsLightningPooled(springBackwardTime);
 
             // now put the spring in front of the whip to pull it forward
             WhipSpring.GetComponent<Rigidbody>().position = whipPositionForwards;
 
-            yield return new WaitForSeconds(springForwardTime);
+            yield return WaitForSecondsLightning.WaitForSecondsLightningPooled(springForwardTime);
 
             // play whip crack sound
             if (WhipCrackAudioSource != null)
@@ -104,7 +113,7 @@ namespace DigitalRuby.ThunderAndLightning
                 WhipCrackAudioSource.Play();
             }
 
-            yield return new WaitForSeconds(strikeWaitTime);
+            yield return WaitForSecondsLightning.WaitForSecondsLightningPooled(strikeWaitTime);
 
             // show the strike paticle system
             if (CollisionParticleSystem != null)
@@ -124,7 +133,7 @@ namespace DigitalRuby.ThunderAndLightning
             }
 
             // wait a bit longer for the whip to recoil
-            yield return new WaitForSeconds(recoilWaitTime);
+            yield return WaitForSecondsLightning.WaitForSecondsLightningPooled(recoilWaitTime);
 
             // put the drag back on
             for (int i = 0; i < WhipStart.transform.childCount; i++)
@@ -140,6 +149,9 @@ namespace DigitalRuby.ThunderAndLightning
             }
         }
 
+        /// <summary>
+        /// Start
+        /// </summary>
         protected override void Start()
         {
             base.Start();
@@ -148,6 +160,9 @@ namespace DigitalRuby.ThunderAndLightning
             WhipHandle.SetActive(false);
         }
 
+        /// <summary>
+        /// Update
+        /// </summary>
         protected override void Update()
         {
             base.Update();
@@ -156,16 +171,25 @@ namespace DigitalRuby.ThunderAndLightning
             gameObject.transform.rotation = RotateWith.transform.rotation;
         }
 
+        /// <summary>
+        /// Fires when spell is cast
+        /// </summary>
         protected override void OnCastSpell()
         {
             StartCoroutine(WhipForward());
         }
 
+        /// <summary>
+        /// Fires when spell is stopped
+        /// </summary>
         protected override void OnStopSpell()
         {
 
         }
 
+        /// <summary>
+        /// Fires when spell is activated
+        /// </summary>
         protected override void OnActivated()
         {
             base.OnActivated();
@@ -173,6 +197,9 @@ namespace DigitalRuby.ThunderAndLightning
             WhipHandle.SetActive(true);
         }
 
+        /// <summary>
+        /// Fires when spell is deactivated
+        /// </summary>
         protected override void OnDeactivated()
         {
             base.OnDeactivated();

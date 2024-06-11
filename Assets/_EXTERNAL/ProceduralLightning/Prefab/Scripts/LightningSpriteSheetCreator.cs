@@ -1,4 +1,4 @@
-﻿//
+//
 // Procedural Lightning for Unity
 // (c) 2015 Digital Ruby, LLC
 // Source code may be used for personal or commercial projects.
@@ -15,29 +15,40 @@ namespace DigitalRuby.ThunderAndLightning
     
 #if UNITY_EDITOR && !UNITY_WEBPLAYER
 
+    /// <summary>
+    /// Helps create lightning sprite sheets
+    /// </summary>
     public class LightningSpriteSheetCreator : MonoBehaviour
     {
+        /// <summary>The width of the spritesheet in pixels</summary>
         [Tooltip("The width of the spritesheet in pixels")]
         public int Width = 512;
 
+        /// <summary>The height of the spritesheet in pixels</summary>
         [Tooltip("The height of the spritesheet in pixels")]
         public int Height = 512;
 
+        /// <summary>The number of rows in the spritesheet</summary>
         [Tooltip("The number of rows in the spritesheet")]
         public int Rows = 5;
 
+        /// <summary>The number of columns in the spritesheet</summary>
         [Tooltip("The number of columns in the spritesheet")]
         public int Columns = 5;
 
+        /// <summary>Delay in between frames to export. Gives time for animations and effects to happen.</summary>
         [Tooltip("Delay in between frames to export. Gives time for animations and effects to happen.")]
         public float FrameDelay = 0.1f;
 
+        /// <summary>Background color for the sprite sheet. Usually black or transparent.</summary>
         [Tooltip("Background color for the sprite sheet. Usually black or transparent.")]
         public Color BackgroundColor = Color.black;
 
+        /// <summary>The full path and file name to save the saved sprite sheet to</summary>
         [Tooltip("The full path and file name to save the saved sprite sheet to")]
         public string SaveFileName;
 
+        /// <summary>The label to notify that the export is working and then completed</summary>
         [Tooltip("The label to notify that the export is working and then completed")]
         public Text ExportCompleteLabel;
 
@@ -56,7 +67,7 @@ namespace DigitalRuby.ThunderAndLightning
 
         private IEnumerator ExportFrame(int row, int column, float delay)
         {
-            yield return new WaitForSeconds(delay);
+            yield return WaitForSecondsLightning.WaitForSecondsLightningPooled(delay);
 
             float cellWidth = (float)Width / (float)Columns;
             float cellHeight = (float)Height / (float)Rows;
@@ -77,7 +88,7 @@ namespace DigitalRuby.ThunderAndLightning
 
         private IEnumerator PerformExport(float delay)
         {
-            yield return new WaitForSeconds(delay);
+            yield return WaitForSecondsLightning.WaitForSecondsLightningPooled(delay);
 
             RenderTexture.active = renderTexture;
             Texture2D png = new Texture2D(Width, Height, TextureFormat.ARGB32, false, false);
@@ -94,6 +105,9 @@ namespace DigitalRuby.ThunderAndLightning
             renderTexture = null;
         }
 
+        /// <summary>
+        /// Export button is tapped
+        /// </summary>
         public void ExportTapped()
         {
             if (exporting)

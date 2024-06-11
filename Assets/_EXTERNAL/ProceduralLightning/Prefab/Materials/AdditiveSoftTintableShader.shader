@@ -10,7 +10,7 @@
 
 	SubShader
 	{
-		Tags{ "Queue" = "Transparent" "IgnoreProjector" = "True" "RenderType" = "Transparent" }
+		Tags { "Queue" = "Transparent" }
 		Blend One OneMinusSrcColor
 		Cull Off
 		Lighting Off
@@ -73,7 +73,7 @@
 			v2f vert(appdata_t v)
 			{
 				v2f o;
-				o.vertex = mul(UNITY_MATRIX_MVP, v.vertex);
+				o.vertex = UnityObjectToClipPos(v.vertex);
 
 #if defined(SOFTPARTICLES_ON)
 

@@ -1,13 +1,66 @@
-﻿Changelog:
-1.7.8 (2016/4/26)	-	Add lightsabre prefab and demo scene
+﻿--------------------------------------------------------------------------------
+Changelog for Procedural Lightning for Unity:
+--------------------------------------------------------------------------------
+2.7.4 (2024-03-10)  -   Fix null ref error.
+                        Fix interval using time instead of timeSinceLevelLoad.
+2.7.3 (2024-02-01)  -   Bug fixes.
+2.7.2 (2023-10-24)  -   Add timeout to try and fix deadlock.
+2.7.1 (2023-06-19)  -   Change coroutine to not allocate wait for seconds every call, use a pooled object instead.
+                    -   Improve multithreaded option to use latest concurrent collections from .NET.
+2.7.0 (2022-11-02)  -   Add AreaOverride property to ThunderAndLightningScript. You can use a BoxCollider to determine start bounds for the lightning.
+2.6.0 (2022-04-03)  -   Fixes for multi-threading.
+2.5.5 (2021-09-14)	-	Fix depth buffer shader error on VR.
+					-	Support lumens (HDRP) using light intensity multiplier parameter.
+2.5.4 (2021-07-10)  -   Improve flicker parameter to be simpler to use.
+					-	Add presets folder.
+2.5.3 (2021-02-26)  -   Attempt to support VR/XR.
+2.5.2 (2019-09-09)	-	Fix layer mask propagation to all child lightning objects.
+2.5.1 (2019-09-04)	-	Added DemoSceneCanvas showing top level UI, and game level canvas with lightning behind top level canvas UI and above game level canvas UI.
+2.5.0 (2019-02-24)	-	LWRP and HDRP support. Some tweaking of properties may be required to get the right appearance, the scriptable render pipelines do not look the same as the standard pipeline.
+2.4.5 (2019-02-20)	-	Add option to hide gizmos.
+					-	Add option to change time to unscaled real time or game time.
+2.4.4 (2018-09-05)	-	Improve LOD calculations and fix bugs.
+2.4.3 (2018-08-07)	-	Improve GC for spline lightning. Add LOD option for lightning script.
+2.4.2 (2018-07-20)	-	Add separate elapsed time, delta time and time scale static fields to lightning bolt script. Set LightningBoltScript.TimeScale if you need to change lightning time speed.
+2.4.1 (2018-05-08)	-	Fix WebGL compile error.
+2.4.0 (2018-04-04)	-	Add intensity flicker properties to lightning bolt script. Great for flickering the lightning rapidly using a noise texture.
+2.3.4 (2018-03-24)	-	Fix lightning path demos. If your path lightning is not working, double check that Unity didn't delete all your path points.
+2.3.3 (2018-02-27)	-	Fix re-orderable lists.
+2.3.2 (2018-02-14)	-	Added AutomaticModeSeconds to lightning bolt prefab and Trigger function. This allows lightning to Trigger automatically until n seconds have passed.
+2.3.1 (2017-11-17)	-	Fix multi-threaded exceptions.
+2.3.0 (2017-11-06)	-	Added CustomTransform callback property to LightningBoltParameters object. This allows you to control the transform of the lightning mesh if it needs to manually rotate, scale or translate based on other transforms. See DemoSceneCustomTransform.
+2.2.1 (2017-07-19)	-	Added lightning bolt parameters Color property. This allows setting the color per bolt, allowing variation of color on bolts from the same script / material.
+					-	Added chaos factor forks property. This allows a separate chaos factor for the forks.
+2.2.0 (2017-07-01)  -   Add orthographic offset and fade in/fully lit/fade out multiplier to light parameters.
+                    -   Added fade in, fully lit and fade out multiplier to lightning bolt prefab script and lightning bolt parameters.
+2.1.6 (2017-06-13)	-	Simplify caching and cleanup.
+2.1.5 (2017-05-01)	-	Fix WebGL compile errors.
+2.1.4 (2017-04-16)	-	Added RandomOverride property to lightning bolt script. See LightningBoltPrefabScript.cs for more details.
+2.1.3 (2017-02-16)	-	Added LightningStartedCallback and LightningEndedCallback to lightning bolt script. Use these to be notified when bolts are started and ended.
+2.1.2 (2017-01-15)	-	Expose soft particles factor in lightning bolt script.
+					-	Update lightning mesh demo to use a scale of 1. To make the mesh larger, you should be able to scale all the various parameters accordingly.
+2.1.1 (2017-01-09)	-	Added better HDR support, made an example scene showing HDR optimized lightning appearance.
+					-	Fix bug in trunk width and duration ranges for lightning bolt prefab. Random value is now correctly within the range specified. You may need to slightly increase these values if your lightning is too thin or doesn't show up for long enough now.
+					-	Add intensity property for HDR. For non-HDR leave it as 1 (the default).
+					-	Lightning field demo looks better.
+2.1.0 (2017-01-01)	-	Added multi threaded generation to the lightning bolt script. Turn this on to generate bolts on a background thread, freeing the main thread CPU to do other tasks. This is somewhat experimental, so let me know if you see problems with it and turn it off if you have crashes.
+2.0.2 (2016-11-17)	-	Fix for HDR and Deferred rendering
+2.0.1 (2016-06-30)	-	Fix for some spells that had the wrong initial direction sometimes
+2.0.0 (2016-06-21)	-	For path lightning, any game object that is null or not active in hierarchy will not be part of the path
+1.7.9 (2016-05-25)	-	Reduce memory allocations by caching parameters internally
+					-	Improve performance by using shader int id's instead of strings
+					-	An error is logged if two lightning scripts are attached to one game object, as this is not supported
+1.7.8 (2016-04-26)	-	Add lightsabre prefab and demo scene
 					-	Add lightning glow texture property to script
-1.7.7 (2016/4/24)	-	Add start and end position overload functions for call lightning in ThunderAndLightning script.
-1.7.6 (2016/4/19)	-	Fix start and end variance with particle system emission
+1.7.7 (2016-04-24)	-	Add start and end position overload functions for call lightning in ThunderAndLightning script
+1.7.6 (2016-04-19)	-	Fix start and end variance with particle system emission
 					-	Improve cache cleanup of lightning bolts and renderers
-1.7.5 (2016/4/18)	-	Added count range probability to reduce the chance that additional bolts are emitted.
-1.7.4 (2016/4/10)	-	Tweak ThunderAndLightning script to use the standard prefab and add a Y value parameter. Other code refactoring.
-1.7.3 (2016/3/24)	-	Added 'CompensateForParentTransform' to the lightning bolt script. Use this if your positions, scaling or rotation messes up the lightning.
+1.7.5 (2016-04-18)	-	Added count range probability to reduce the chance that additional bolts are emitted.
+1.7.4 (2016-04-10)	-	Tweak ThunderAndLightning script to use the standard prefab and add a Y value parameter. Other code refactoring.
+1.7.3 (2016-03-24)	-	Added 'CompensateForParentTransform' to the lightning bolt script. Use this if your positions, scaling or rotation messes up the lightning.
 					-	Added CameraMode parameter to LightningBoltScript. This replaces the "AllowOrthographicMode" parameter.
+
+// change log of unknown dates
 1.7.2	-	Added demo scene to show how to trigger lightning manually with a list of points
 1.7.1	-	Fixed crash when deploying path lightning to a build
 		-	Multiple bug fixes for ThunderAndLightning script (null reference errors, cloud only lightning not working, etc.)

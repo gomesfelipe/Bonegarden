@@ -3,6 +3,9 @@
 
 #include "UnityCG.cginc"
 
+uniform sampler2D TOD_BayerTexture;
+uniform sampler2D TOD_CloudTexture;
+
 uniform float4x4 TOD_World2Sky;
 uniform float4x4 TOD_Sky2World;
 
@@ -41,6 +44,7 @@ uniform float TOD_CloudOpacity;
 uniform float TOD_CloudCoverage;
 uniform float TOD_CloudSharpness;
 uniform float TOD_CloudDensity;
+uniform float TOD_CloudColoring;
 uniform float TOD_CloudAttenuation;
 uniform float TOD_CloudSaturation;
 uniform float TOD_CloudScattering;
@@ -48,6 +52,10 @@ uniform float TOD_CloudBrightness;
 uniform float3 TOD_CloudOffset;
 uniform float3 TOD_CloudWind;
 uniform float3 TOD_CloudSize;
+
+uniform float TOD_CloudShadowCutoff;
+uniform float TOD_CloudShadowFade;
+uniform float TOD_CloudShadowIntensity;
 
 uniform float TOD_StarSize;
 uniform float TOD_StarBrightness;
@@ -59,6 +67,8 @@ uniform float TOD_SunMeshBrightness;
 uniform float TOD_MoonMeshContrast;
 uniform float TOD_MoonMeshBrightness;
 
+uniform float4 TOD_ScatterDensity;
+
 uniform float3 TOD_kBetaMie;
 uniform float4 TOD_kSun;
 uniform float4 TOD_k4PI;
@@ -66,7 +76,7 @@ uniform float4 TOD_kRadius;
 uniform float4 TOD_kScale;
 
 // Vertex transform used by the entire sky dome
-#define TOD_TRANSFORM_VERT(vert) mul(UNITY_MATRIX_MVP, vert)
+#define TOD_TRANSFORM_VERT(vert) UnityObjectToClipPos(vert)
 
 // UV rotation matrix constructor
 #define TOD_ROTATION_UV(angle) float2x2(cos(angle), -sin(angle), sin(angle), cos(angle))
@@ -77,5 +87,20 @@ uniform float4 TOD_kScale;
 // Approximates gamma by 2.0 instead of 2.2
 #define TOD_GAMMA2LINEAR(color) (color * color)
 #define TOD_LINEAR2GAMMA(color) sqrt(color)
+
+// Matrices
+#define TOD_Object2World unity_ObjectToWorld
+#define TOD_World2Object unity_WorldToObject
+
+// Screen space adjust
+#define TOD_UV(x, y) UnityStereoScreenSpaceUVAdjust(x, y)
+
+// Stereo output
+#define TOD_VERTEX_OUTPUT_STEREO UNITY_VERTEX_OUTPUT_STEREO
+#define TOD_INITIALIZE_VERTEX_OUTPUT_STEREO(o) UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o)
+
+// Instancing
+#define TOD_INSTANCE_ID UNITY_VERTEX_INPUT_INSTANCE_ID
+#define TOD_SETUP_INSTANCE_ID(o) UNITY_SETUP_INSTANCE_ID(o)
 
 #endif

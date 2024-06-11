@@ -1,4 +1,4 @@
-// Amplify Color - Advanced Color Grading for Unity Pro
+// Amplify Color - Advanced Color Grading for Unity
 // Copyright (c) Amplify Creations, Lda <info@amplify.pt>
 
 using System;
@@ -18,6 +18,15 @@ namespace AmplifyColor
 			GenerateTexture();
 		}
 
+		public void Release()
+		{
+			if ( _texture != null )
+			{
+				Texture2D.DestroyImmediate( _texture );
+				_texture = null;
+			}
+		}
+
 		private void GenerateTexture()
 		{
 			if ( _data == null )
@@ -35,6 +44,9 @@ namespace AmplifyColor
 			}
 
 			int size = width;
+
+			if ( _texture != null )
+				Texture2D.DestroyImmediate( _texture );
 
 			_texture = new Texture2D( size * size, size, TextureFormat.ARGB32, false );
 

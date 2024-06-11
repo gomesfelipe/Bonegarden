@@ -1,4 +1,4 @@
-﻿//
+//
 // Procedural Lightning for Unity
 // (c) 2015 Digital Ruby, LLC
 // Source code may be used for personal or commercial projects.
@@ -10,33 +10,40 @@ using System.Collections.Generic;
 
 namespace DigitalRuby.ThunderAndLightning
 {
+    /// <summary>
+    /// Script that generates lightning on the surface of a mesh
+    /// </summary>
     public class LightningMeshSurfaceScript : LightningBoltPrefabScriptBase
     {
+        /// <summary>The mesh filter. You must assign a mesh filter in order to create lightning on the mesh.</summary>
         [Header("Lightning Mesh Properties")]
         [Tooltip("The mesh filter. You must assign a mesh filter in order to create lightning on the mesh.")]
         public MeshFilter MeshFilter;
 
-        [Tooltip("The mesh collider. This is used to get random points on the mesh.")]
-        public Collider MeshCollider;
-
+        /// <summary>Random range that the point will offset from the mesh, using the normal of the chosen point to offset</summary>
         [SingleLine("Random range that the point will offset from the mesh, using the normal of the chosen point to offset")]
         public RangeOfFloats MeshOffsetRange = new RangeOfFloats { Minimum = 0.5f, Maximum = 1.0f };
 
+        /// <summary>Range for points in the lightning path</summary>
         [Header("Lightning Path Properties")]
         [SingleLine("Range for points in the lightning path")]
         public RangeOfIntegers PathLengthCount = new RangeOfIntegers { Minimum = 3, Maximum = 6 };
 
+        /// <summary>Range for minimum distance between points in the lightning path</summary>
         [SingleLine("Range for minimum distance between points in the lightning path")]
         public RangeOfFloats MinimumPathDistanceRange = new RangeOfFloats { Minimum = 0.5f, Maximum = 1.0f };
 
+        /// <summary>The maximum distance between mesh points. When walking the mesh, if a point is greater than this, the path direction is reversed. This tries to avoid paths crossing between mesh points that are not actually physically touching.</summary>
         [Tooltip("The maximum distance between mesh points. When walking the mesh, if a point is greater than this, the path direction is reversed. " +
             "This tries to avoid paths crossing between mesh points that are not actually physically touching.")]
         public float MaximumPathDistance = 2.0f;
         private float maximumPathDistanceSquared;
 
+        /// <summary>Whether to use spline interpolation between the path points. Paths must be at least 4 points long to be splined.</summary>
         [Tooltip("Whether to use spline interpolation between the path points. Paths must be at least 4 points long to be splined.")]
         public bool Spline = false;
 
+        /// <summary>For spline. the distance hint for each spline segment. Set to &lt;= 0 to use the generations to determine how many spline segments to use. If &gt; 0, it will be divided by Generations before being applied. This value is a guideline and is approximate, and not uniform on the spline.</summary>
         [Tooltip("For spline. the distance hint for each spline segment. Set to <= 0 to use the generations to determine how many spline segments to use. " +
             "If > 0, it will be divided by Generations before being applied. This value is a guideline and is approximate, and not uniform on the spline.")]
         public float DistancePerSegmentHint = 0.0f;
@@ -53,18 +60,25 @@ namespace DigitalRuby.ThunderAndLightning
             }
             else if (MeshFilter.sharedMesh != previousMesh)
             {
-                previousMesh = MeshFilter.sharedMesh;
-                meshHelper = new MeshHelper(previousMesh);
+                if (previousMesh != null && !previousMesh.isReadable)
+                {
+                    Debug.LogError("Mesh is not readable, cannot create lightning on mesh");
+                }
+                else
+                {
+                    previousMesh = MeshFilter.sharedMesh;
+                    meshHelper = new MeshHelper(previousMesh);
 
 #if DEBUG
 
-                if (previousMesh.GetTopology(0) != MeshTopology.Triangles)
-                {
-                    Debug.LogError("Mesh topology must be triangles");
-                }
+                    if (previousMesh.GetTopology(0) != MeshTopology.Triangles)
+                    {
+                        Debug.LogError("Mesh topology must be triangles");
+                    }
 
 #endif
 
+                }
             }
         }
 
@@ -74,7 +88,9 @@ namespace DigitalRuby.ThunderAndLightning
         /// <returns>Lightning bolt path parameters</returns>
         protected override LightningBoltParameters OnCreateParameters()
         {
-            return new LightningBoltPathParameters { Generator = LightningGeneratorPath.PathInstance };
+            LightningBoltParameters p = base.OnCreateParameters();
+            p.Generator = LightningGeneratorPath.PathGeneratorInstance;
+            return p;
         }
 
         /// <summary>
@@ -112,7 +128,7 @@ namespace DigitalRuby.ThunderAndLightning
             sourcePoints.Add(MeshFilter.transform.TransformPoint(prevPoint));
             int dir = (UnityEngine.Random.Range(0, 1) == 1 ? 3 : -3);
             int pathLength = UnityEngine.Random.Range(PathLengthCount.Minimum, PathLengthCount.Maximum);
-            while (pathLength != 0)
+            while (pathLength > 0)
             {
                 triangleIndex += dir;
                 if (triangleIndex >= 0 && triangleIndex < meshHelper.Triangles.Length)
@@ -144,18 +160,30 @@ namespace DigitalRuby.ThunderAndLightning
             }
         }
 
+        /// <summary>
+        /// Start
+        /// </summary>
         protected override void Start()
         {
             base.Start();
         }
 
+        /// <summary>
+        /// Update
+        /// </summary>
         protected override void Update()
         {
-            CheckMesh();
-
+            if (Time.timeScale > 0.0f)
+            {
+                CheckMesh();
+            }
             base.Update();
         }
 
+        /// <summary>
+        /// Create a lightning bolt
+        /// </summary>
+        /// <param name="parameters">Parameters</param>
         public override void CreateLightningBolt(LightningBoltParameters parameters)
         {
             if (meshHelper == null)
@@ -164,23 +192,22 @@ namespace DigitalRuby.ThunderAndLightning
             }
 
             Generations = parameters.Generations = Mathf.Clamp(Generations, 1, LightningSplineScript.MaxSplineGenerations);
-            LightningBoltPathParameters pathParameters = parameters as LightningBoltPathParameters;
             sourcePoints.Clear();
             PopulateSourcePoints(sourcePoints);
             if (sourcePoints.Count > 1)
             {
+                parameters.Points.Clear();
                 if (Spline && sourcePoints.Count > 3)
                 {
-                    pathParameters.Points = new List<Vector3>(sourcePoints.Count * Generations);
-                    LightningSplineScript.PopulateSpline(pathParameters.Points, sourcePoints, Generations, DistancePerSegmentHint, Camera);
-                    pathParameters.SmoothingFactor = (pathParameters.Points.Count - 1) / sourcePoints.Count;
+                    LightningSplineScript.PopulateSpline(parameters.Points, sourcePoints, Generations, DistancePerSegmentHint, Camera);
+                    parameters.SmoothingFactor = (parameters.Points.Count - 1) / sourcePoints.Count;
                 }
                 else
                 {
-                    pathParameters.Points = new List<Vector3>(sourcePoints);
-                    pathParameters.SmoothingFactor = 1;
+                    parameters.Points.AddRange(sourcePoints);
+                    parameters.SmoothingFactor = 1;
                 }
-                base.CreateLightningBolt(pathParameters);
+                base.CreateLightningBolt(parameters);
             }
         }
     }

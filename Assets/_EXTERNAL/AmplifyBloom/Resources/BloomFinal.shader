@@ -1,4 +1,6 @@
-﻿// Amplify Bloom - Advanced Bloom Post-Effect for Unity
+﻿// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+
+// Amplify Bloom - Advanced Bloom Post-Effect for Unity
 // Copyright (c) Amplify Creations, Lda <info@amplify.pt>
 
 Shader "Hidden/BloomFinal"
@@ -83,7 +85,7 @@ Shader "Hidden/BloomFinal"
 		{
 			v2f_img_custom o;
 
-			o.pos = mul ( UNITY_MATRIX_MVP, v.vertex );
+			o.pos = UnityObjectToClipPos ( v.vertex );
 			o.uv = float4( v.texcoord.xy, 1, 1 );
 
 		#ifdef UNITY_HALF_TEXEL_OFFSET

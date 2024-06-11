@@ -11,7 +11,7 @@
     }
     SubShader
 	{
-        Tags { "RenderType"="Transparent" "IgnoreProjector"="True" "Queue"="Transparent" "LightMode"="Vertex" }
+        Tags { "Queue"="Transparent" }
 		Blend SrcAlpha OneMinusSrcAlpha
         LOD 100
  
@@ -52,15 +52,15 @@
 				if (lightPos.w == 0)
 				{
 					// directional light, the lightPos is actually the direction of the light
-					fixed3 diff = max(0, dot(normal, -normalize(lightPos)));
+					fixed3 diff = max(0, dot(normal, normalize(lightPos)));
 					return lightColor + (currentLightColor * diff * _DirectionalLightMultiplier);
 				}
 				else
 				{
-					float3 toLight = lightPos - pos.xyz;
+					float3 toLight = pos.xyz - lightPos;
 	                float lengthSq = dot(toLight, toLight);
 	                float atten = 1.0 / (1.0 + (lengthSq * unity_LightAtten[index].z));
-					float diff = max(0, dot (normal, normalize(toLight)));
+					float diff = max(0, dot(normal, normalize(toLight)));
 					return lightColor + (currentLightColor * diff * atten * _PointSpotLightMultiplier);
 				}
 			}
@@ -92,7 +92,7 @@
             v2f vert(appdata_t v)
             {
                 v2f o;
-                o.pos = mul(UNITY_MATRIX_MVP, v.vertex);
+                o.pos = UnityObjectToClipPos(v.vertex);
                 o.uv_MainTex = TRANSFORM_TEX(v.texcoord, _MainTex);
                 o.color = ApplyLightsToVertex(v.vertex, v.normal, v.color) * _TintColor;
                 return o; 

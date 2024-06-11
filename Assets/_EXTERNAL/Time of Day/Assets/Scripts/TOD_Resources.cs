@@ -61,6 +61,7 @@ public class TOD_Resources : MonoBehaviour
 	public int ID_CloudCoverage    { get; private set; }
 	public int ID_CloudSharpness   { get; private set; }
 	public int ID_CloudDensity     { get; private set; }
+	public int ID_CloudColoring    { get; private set; }
 	public int ID_CloudAttenuation { get; private set; }
 	public int ID_CloudSaturation  { get; private set; }
 	public int ID_CloudScattering  { get; private set; }
@@ -128,6 +129,7 @@ public class TOD_Resources : MonoBehaviour
 		ID_CloudCoverage    = Shader.PropertyToID("TOD_CloudCoverage");
 		ID_CloudSharpness   = Shader.PropertyToID("TOD_CloudSharpness");
 		ID_CloudDensity     = Shader.PropertyToID("TOD_CloudDensity");
+		ID_CloudColoring    = Shader.PropertyToID("TOD_CloudColoring");
 		ID_CloudAttenuation = Shader.PropertyToID("TOD_CloudAttenuation");
 		ID_CloudSaturation  = Shader.PropertyToID("TOD_CloudSaturation");
 		ID_CloudScattering  = Shader.PropertyToID("TOD_CloudScattering");

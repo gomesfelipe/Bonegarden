@@ -1,3 +1,5 @@
+// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+
 Shader "Ceto/BlurEffectConeTap" 
 {
 	Properties { _MainTex ("", any) = "" {} }
@@ -17,7 +19,7 @@ Shader "Ceto/BlurEffectConeTap"
 	v2f vert( appdata_img v ) 
 	{
 		v2f o; 
-		o.pos = mul(UNITY_MATRIX_MVP, v.vertex);
+		o.pos = UnityObjectToClipPos(v.vertex);
 		o.uv = v.texcoord - _BlurOffsets.xy * _MainTex_TexelSize.xy; 
 		o.taps[0] = o.uv + _MainTex_TexelSize * _BlurOffsets.xy;
 		o.taps[1] = o.uv - _MainTex_TexelSize * _BlurOffsets.xy;

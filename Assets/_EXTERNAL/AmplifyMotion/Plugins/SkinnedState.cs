@@ -74,7 +74,7 @@ internal class SkinnedState : AmplifyMotion.MotionState
 
 		m_vertexCount = m_renderer.sharedMesh.vertexCount;
 		if ( m_renderer.quality == SkinQuality.Auto )
-			m_weightCount = ( int ) QualitySettings.blendWeights;
+			m_weightCount = ( int ) QualitySettings.skinWeights;
 		else
 			m_weightCount = ( int ) m_renderer.quality;
 
@@ -314,7 +314,7 @@ internal class SkinnedState : AmplifyMotion.MotionState
 			return;
 		}
 
-		Profiler.BeginSample( "Skinned.Update" );
+		UnityEngine.Profiling.Profiler.BeginSample( "Skinned.Update" );
 
 		bool isVisible = m_renderer.isVisible;
 
@@ -333,7 +333,7 @@ internal class SkinnedState : AmplifyMotion.MotionState
 
 		m_wasVisible = isVisible;
 
-		Profiler.EndSample();
+		UnityEngine.Profiling.Profiler.EndSample();
 	}
 
 	void WaitForAsyncUpdate()
@@ -351,7 +351,7 @@ internal class SkinnedState : AmplifyMotion.MotionState
 
 	internal override void RenderVectors( Camera camera, float scale, AmplifyMotion.Quality quality )
 	{
-		Profiler.BeginSample( "Skinned.Render" );
+		UnityEngine.Profiling.Profiler.BeginSample( "Skinned.Render" );
 
 		if ( m_initialized && !m_error && m_renderer.isVisible )
 		{
@@ -385,7 +385,7 @@ internal class SkinnedState : AmplifyMotion.MotionState
 			}
 		}
 
-		Profiler.EndSample();
+		UnityEngine.Profiling.Profiler.EndSample();
 	}
 }
 }

@@ -1,4 +1,4 @@
-// Amplify Color - Advanced Color Grading for Unity Pro
+// Amplify Color - Advanced Color Grading for Unity
 // Copyright (c) Amplify Creations, Lda <info@amplify.pt>
 
 using System.IO;
@@ -10,11 +10,18 @@ namespace AmplifyColor
 	public class LUTWriter
 	{
 		private string _texturePath;
+		private bool _overwrite = false;
 
 		public string TexturePath
 		{
 			get { return _texturePath; }
 			set { _texturePath = value; }
+		}
+
+		public bool Overwrite
+		{
+			get { return _overwrite; }
+			set { _overwrite = value; }
 		}
 
 		public void SaveLUT( LUTResult lutResult )
@@ -50,12 +57,10 @@ namespace AmplifyColor
 				}
 			}
 
-			if ( File.Exists( _texturePath ) && !justBrowsed )
+			if ( File.Exists( _texturePath ) && !justBrowsed && !_overwrite )
 			{
 				if ( !EditorUtility.DisplayDialog( "Overwrite?", "File already exists. This action will overwrite the current file. Do you want to continue?", "Overwrite", "Cancel" ) )
-				{
 					return;
-				}
 			}
 
 			File.WriteAllBytes( _texturePath, lutResult.Texture.EncodeToPNG() );
@@ -71,13 +76,22 @@ namespace AmplifyColor
 			if ( tImporter != null )
 			{
 				tImporter.mipmapEnabled = false;
-				tImporter.isReadable = true;
-				tImporter.textureType = TextureImporterType.Advanced;
+				tImporter.isReadable = false;
+
 				tImporter.filterMode = FilterMode.Bilinear;
 				tImporter.anisoLevel = 0;
+
+			#if UNITY_5_6_OR_NEWER
+				tImporter.textureType = TextureImporterType.Default;
+				tImporter.textureCompression = TextureImporterCompression.Uncompressed;
+				tImporter.sRGBTexture = false;
+			#else
+				tImporter.textureType = TextureImporterType.Advanced;
 				tImporter.textureFormat = TextureImporterFormat.AutomaticTruecolor;
-				tImporter.wrapMode = TextureWrapMode.Clamp;
 				tImporter.linearTexture = true;
+			#endif
+				tImporter.wrapMode = TextureWrapMode.Clamp;
+				tImporter.maxTextureSize = 1024;
 				AssetDatabase.ImportAsset( _texturePath, ImportAssetOptions.ForceUpdate );
 			}
 		}

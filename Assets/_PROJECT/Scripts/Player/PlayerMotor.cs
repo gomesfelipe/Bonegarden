@@ -13,9 +13,7 @@ public class PlayerMotor : MonoBehaviour
 {
 
     [Header("Setup")]
-    public Transform HeadTransform;
-    public Transform TiltTransform;
-    public Transform CameraTransform;
+    public Transform HeadTransform, TiltTransform, CameraTransform;
     public SphereCollider LowerCollider;
     public BoxCollider UpperCollider;
     public PlayerViewSway Sway;
@@ -33,15 +31,11 @@ public class PlayerMotor : MonoBehaviour
     [Header("Movement Params")]
     public float Gravity = 500;
     public float Friction = 8;
-    public float MoveSpeed = 300;
-    public float DuckSpeed = 100f;
-    public float RunAcceleration = 14f;
-    public float RunDeacceleration = 100f;
-    public float AirAcceleration = 0;
-    public float AirDeacceleration = 0f;
+    public float MoveSpeed = 300, DuckSpeed = 100f;
+    public float RunAcceleration = 14f, RunDeacceleration = 100f;
+    public float AirAcceleration = 0, AirDeacceleration = 0f;
     public float airControl = 100f;
-    public float SideStrafeAcceleration = 100f;
-    public float SideStrafeSpeed = 100;
+    public float SideStrafeAcceleration = 100f, SideStrafeSpeed = 100;
     public float JumpSpeed = 210f;
     public float MoveScale = 1f;
     public float JumpGracePeriod = 0.5f;
@@ -51,10 +45,8 @@ public class PlayerMotor : MonoBehaviour
 
     [Header("Dodge params")]
     public int DodgeStaminaConsumption = 45;
-    public float DodgeSpeed = 10f;
-    public float DodgeHeight = 0.4f;
-    public float DodgeFovIncrease = 15f;
-    public float DodgeTimeInterval = 0.5f;
+    public float DodgeSpeed = 10f, DodgeHeight = 0.4f;
+    public float DodgeFovIncrease = 15f, DodgeTimeInterval = 0.5f;
     [Header("Tilt params")]
     public float AirHeadTilt = 1f;
     public float GroundHeadTilt = 0.5f;
@@ -70,7 +62,6 @@ public class PlayerMotor : MonoBehaviour
     public float WalljumpHeight;
     public float WalljumpMaxMagnitude;
     public int WalljumpStaminaConsumption;
-
 
     private Transform _transform;
     private Rigidbody _rb;
@@ -100,8 +91,8 @@ public class PlayerMotor : MonoBehaviour
     void Awake()
     {
         _transform = GetComponent<Transform>();
-        _mouse = GetComponent<PlayerMouseLook>();
-        _rb = GetComponent<Rigidbody>();
+        _mouse ??= GetComponent<PlayerMouseLook>();
+        _rb ??= GetComponent<Rigidbody>();
         _input = GetComponent<PlayerInput>();
         _stamina = GetComponent<PlayerStamina>();
         _camera = CameraTransform.GetComponent<Camera>();

@@ -6,51 +6,51 @@
 
 \n \section about About
 
-Time of Day is a package to render realistic dynamic sky domes with day and night cycle, realistic celestials, dynamic clouds and physically based atmospheric scattering.<br>
+Time of Day is a package to render realistic dynamic sky domes with day and night cycle, realistic celestials, dynamic clouds and physically based atmospheric scattering.
 
-<br><b>Sky:</b><br>
-- Physically based sky shading<br>
-- Rayleigh & Mie scattering<br>
-- Highly customizable<br>
-- Sun and moon god rays<br>
-- Aerial perspective<br>
+<b>Sky:</b>
+- Physically based sky shading
+- Rayleigh & Mie scattering
+- Highly customizable
+- Sun and moon god rays
+- Aerial perspective
 
-<br><b>Lighting:</b><br>
-- Full PBR & HDR support<br>
-- Realtime Unity 5 ambient light<br>
-- Realtime Unity 5 reflections<br>
+<b>Lighting:</b>
+- Full PBR & HDR support
+- Realtime ambient light
+- Realtime reflections
 
-<br><b>Clouds:</b><br>
-- Physically based cloud shading<br>
-- Semi-volumetric cloud layers<br>
-- Dynamically batched cloud billboards<br>
-- Adjustable wind speed & direction<br>
-- Configurable coverage and shading<br>
-- Correctly projected cloud shadows<br>
+<b>Clouds:</b>
+- Physically based cloud shading
+- Semi-volumetric cloud layers
+- Dynamically batched cloud billboards
+- Adjustable wind speed & direction
+- Configurable coverage and shading
+- Correctly projected cloud shadows
 
-<br><b>Time & Location:</b><br>
-- Dynamic day & night cycle<br>
-- Adjustable time progression curve<br>
-- Full longitude, latitude & time zone support<br>
-- Full Gregorian calendar support<br>
-- Realistic sun position<br>
-- Realistic moon position and phase<br>
-- Realistic star constellations<br>
+<b>Time & Location:</b>
+- Dynamic day & night cycle
+- Adjustable time progression curve
+- Full longitude, latitude & time zone support
+- Full Gregorian calendar support
+- Realistic sun position
+- Realistic moon position and phase
+- Realistic star constellations
 
-<br><b>Performance & Requirements:</b><br>
-- Extremely optimized shaders & scripts<br>
-- Zero dynamic memory allocations<br>
-- Supports shader model 2.0<br>
-- Supports all platforms<br>
-- Supports linear & gamma color space<br>
-- Supports forward & deferred rendering<br>
-- Supports HDR & LDR rendering<br>
-- Supports virtual reality hardware<br>
+<b>Performance & Requirements:</b>
+- Extremely optimized shaders & scripts
+- Zero dynamic memory allocations
+- Supports shader model 2.0
+- Supports all platforms
+- Supports linear & gamma color space
+- Supports forward & deferred rendering
+- Supports HDR & LDR rendering
+- Supports virtual reality hardware
+- Supports single-pass stereo rendering
 
-<br>[ <a href="http://goo.gl/jAvPoE">Forum Thread</a> | <a href="http://goo.gl/uwZsbo">Web Player</a> | <a href="http://goo.gl/n0RP0i">Documentation</a> ]<br>
+[ <a href="https://forum.unity.com/threads/time-of-day-dynamic-sky-dome.172763/">Discussion</a> | <a href="https://andererandre.github.io/TOD/demo/">Demo</a> | <a href="https://andererandre.github.io/TOD/docs/">Documentation</a> ]
 
-<br><b>You can expect a thoroughly documented, well-written and highly optimized code base.<br>
-Includes references to the scientific papers the calculations are based on.</b>
+<b>You can expect a thoroughly documented, well-written and highly optimized code base with references to the scientific papers it is based on.</b>
 
 
 
@@ -256,22 +256,37 @@ The package comes with various example scripts to demonstrate sky dome integrati
 \n \section faq Frequently Asked Questions
 
 Q: How can I get a sky dome (TOD_Sky) reference in my custom scripts?
-- TOD_Sky.Instance keeps a static reference to the most recent sky dome that has been instantiated
-- TOD_Sky.Instances keeps a static list of referenes to all sky domes that have been instantiated
+- TOD_Sky.Instance keeps a static reference to the most recent sky dome that has been instantiated.
+- TOD_Sky.Instances keeps a static list of referenes to all sky domes that have been instantiated.
 
 Q: How can I use the sky dome with virtual reality devices like the Oculus Rift?
-- Add the TOD_Camera script to one of the cameras (preferably the one that's being rendered first)
-- The sky will render correctly without artifacts
+- Add the TOD_Camera script to one of the cameras (preferably the one that's being rendered first).
+- The sky will render correctly without artifacts.
 
 Q: How can I render a cubemap or custom skybox at night?
-- Make sure the "Space" child object is enabled
-- Assign your cubemap to the "Space" material and adjust the brightness parameter
+- Make sure the "Space" child object is enabled.
+- Assign your cubemap to the "Space" material and adjust the brightness parameter.
+
+Q: How can I add the clouds, sun, moon, or stars to reflections?
+- Put any game objects you want to show up in reflections on a separate layer.
+- Add that layer to the Reflection.CullingMask variable.
 
 Q: How can I align the sky dome geographic directions with those of my scene?
-- Rotate the sky dome around the y-axis such that the sun rises in the east of your scene
+- Rotate the sky dome around the y-axis such that the sun rises in the east of your scene.
+
+Q: How can I adjust the color of the sky around sunrise and sunset?
+- Use the Day.SkyColor gradient to adjust the base color tint of the sky at different times of day.
+- The left end of the gradient is used around noon.
+- The right end of the gradient is used around sunrise and sunset.
 
 Q: My terrain or object lighting looks incorrect when the time of day changes.
 - Make sure that static lightmapping is disabled when using a dynamic day / night cycle.
+
+Q: My shadows are flickering when the time of day changes.
+- This is a limitation of shadow maps in general, but there are ways to counteract.
+- Shadow quality depends on the shadow resolution, shadow distance and shadow cascade quality settings.
+- Shadow flickering is caused by light source movement and amplified by huge draw distances or low qualities.
+- Increasing Light.UpdateInterval moves the light source less frequently and therefore reduces flickering.
 
 Q: How can I get the god rays (TOD_Rays) to consider or ignore a certain object?
 - TOD_Rays uses the depth buffer and color buffer alpha values to block light.
@@ -279,15 +294,21 @@ Q: How can I get the god rays (TOD_Rays) to consider or ignore a certain object?
 - Objects that should not block god rays have to use the "ZWrite Off" and "ColorMask RGB" shader features.
 
 Q: How can I disable some part of the sky dome?
-- Disable any child game object to keep that specific part of the sky dome from rendering
-- You can also disable any script on the parent game object individually to disable that specific functionality
+- Disable any child game object to keep that specific part of the sky dome from rendering.
+- You can also disable any script on the parent game object individually to disable that specific functionality.
+
+Q: I see black lines around objects when using anti-aliasing in forward rendering.
+- Disable the "Single Pass" flag on the TOD_Scattering image effect.
+
+Q: My water reflections are missing the sky dome even though its layer is included.
+- Disable the "Single Pass" flag on the TOD_Scattering image effect.
 
 <b>NOTE:</b>
-Always disable entire child objects rather than their individual components. The enabled states of components are being be modified by the sky dome scripts, which can override your changes.
+Always disable entire child objects rather than their individual components since the enabled states of components are being modified by the sky dome scripts, which can override your changes.
 
 
 
-\n \section contact Contact Information
+\n \section troubleshooting Troubleshooting
 
 If you encounter an issue, please make sure to follow these steps before contacting me:
 - Check if the question you are about to ask is in the FAQ section above
@@ -296,14 +317,16 @@ If you encounter an issue, please make sure to follow these steps before contact
 - Try a full Time of Day reimport (remove the Time of Day folder from the project, restart Unity, reimport Time of Day)
 - Try a Unity library rebuild to ensure the issue is reproducible
 
+
+
+\n \section contact Contact Information
+
 To contact me use one of the following methods:
 - In the official <a href="http://forum.unity3d.com/threads/172763-Time-of-Day-Realistic-day-night-cycle-and-atmospheric-scattering">forum thread</a> of the package
 - Via <a href="http://forum.unity3d.com/members/30479-plzdiekthxbye">personal message</a> on the Unity community forums
-- Via <a href="https://twitter.com/andererandre">Twitter</a>
-- Via <a href="http://modmonkeys.net/contact">my website</a>
 
 <b>NOTE:</b>
-I should always be able to reply within two work days. If I have not replied after several days, try using a different contact method in case there is an issue with the one you chose.
+I should always be able to reply within a couple of work days. If I have not replied after a week, try using a different contact method in case there is an issue with the one you chose.
 
 
 
@@ -319,6 +342,36 @@ The following literature has been used to implement physically based atmospheric
 
 
 \n \section changelog Changelog
+
+    VERSION 3.3.0
+    -------------
+    - Added support for Unity 2018.2
+    - Removed support for Unity 4.x
+    - Added start distance to scattering image effect
+    - Added TOD_Sky.SaveParameters to export parameters at runtime
+    - Improved TOD_Scattering fog density calculation
+    - Fixed a bug in the star position calculation
+    - Fixed color space and color range parameters affecting TOD_Scattering fog density
+    - Fixed TOD_Sky.SunriseTime and TOD_Sky.SunsetTime not being converted to the local time zone
+
+    VERSION 3.2.0
+    -------------
+    - Added support for Unity 5.5 and 5.6
+    - Added support for single-pass stereo rendering
+    - Added directional scattering occlusion to TOD_Scattering
+    - Added gradient fog mode that uses the unmodified gradient color
+    - Added camera movement parameter to TOD_Animation
+    - Added single-pass toggle to TOD_Scattering (disable when using AA / planar water reflections)
+    - Improved forward rendering and anti-aliasing support
+    - Improved overall visuals in gamma color space
+    - Improved referencing when instantiating camera and sky at runtime
+    - Fixed ambient light multiplier being ignored on some Unity versions
+    - Fixed issues with extreme HDR values
+    - Fixed several cloud shadow issues
+    - Fixed issues when rotating the sky dome on the X or Z axis
+    - Fixed weather manager error when fade time is set to zero
+    - Fixed various smaller issues and annoyances
+    - Deprecated clear alpha pass for better compatibility
 
     VERSION 3.1.0
     -------------

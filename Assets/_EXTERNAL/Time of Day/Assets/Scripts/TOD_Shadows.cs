@@ -11,6 +11,8 @@ public class TOD_Shadows : TOD_ImageEffect
 
 	public Texture2D CloudTexture = null;
 
+	[Header("Shadows")]
+
 	[Range(0f, 1f)] public float Cutoff    = 0.0f;
 	[Range(0f, 1f)] public float Fade      = 0.0f;
 	[Range(0f, 1f)] public float Intensity = 0.5f;
@@ -41,11 +43,12 @@ public class TOD_Shadows : TOD_ImageEffect
 		sky.Components.Shadows = this;
 
 		shadowMaterial.SetMatrix("_FrustumCornersWS", FrustumCorners());
-		shadowMaterial.SetTexture("_CloudTex", CloudTexture);
-		shadowMaterial.SetFloat("_Cutoff", Cutoff);
-		shadowMaterial.SetFloat("_Fade", Fade);
-		shadowMaterial.SetFloat("_Intensity", Intensity * Mathf.Clamp01(1 - sky.SunZenith / 90f));
 
-		CustomBlit(source, destination, shadowMaterial);
+		Shader.SetGlobalTexture("TOD_CloudTexture", CloudTexture);
+		Shader.SetGlobalFloat("TOD_CloudShadowCutoff", Cutoff);
+		Shader.SetGlobalFloat("TOD_CloudShadowFade", Fade);
+		Shader.SetGlobalFloat("TOD_CloudShadowIntensity", Intensity * Mathf.Clamp01(1 - sky.SunZenith / 90f));
+
+		Graphics.Blit(source, destination, shadowMaterial);
 	}
 }

@@ -1,4 +1,4 @@
-// Amplify Color - Advanced Color Grading for Unity Pro
+// Amplify Color - Advanced Color Grading for Unity
 // Copyright (c) Amplify Creations, Lda <info@amplify.pt>
 
 using System;
@@ -37,16 +37,29 @@ namespace AmplifyColor
 				return false;
 			}
 
-            var component = ( MonoBehaviour ) camera.GetComponent<AmplifyColorBase>();
-			bool enabled = false;
+            AmplifyColorBase component = camera.GetComponent<AmplifyColorBase>();
+			Tonemapping prevTonemapper = Tonemapping.Disabled;
+			float prevExposure = 1.0f;
+			float prevLinearWhitePoint = 11.2f;
+			bool prevApplyDithering = false;
+			float prevBlendAmount = 0.0f;
+			Texture prevLUT = null;
 
-			if ( !ToolSettings.Instance.ApplyLUT )
+			if ( component != null )
 			{
-				if ( component != null )
-				{
-					enabled = component.enabled;
-					component.enabled = false;
-				}
+				prevTonemapper = component.Tonemapper;
+				prevExposure = component.Exposure;
+				prevLinearWhitePoint = component.LinearWhitePoint;
+				prevApplyDithering = component.ApplyDithering;
+				prevBlendAmount = component.BlendAmount;
+				prevLUT = component.LutTexture;
+
+				component.Tonemapper = ToolSettings.Instance.ApplyHDRControl ? component.Tonemapper : Tonemapping.Disabled;
+				component.Exposure = ToolSettings.Instance.ApplyHDRControl ? component.Exposure : 1.0f;
+				component.LinearWhitePoint = ToolSettings.Instance.ApplyHDRControl ? component.LinearWhitePoint : 11.2f;
+				component.ApplyDithering = ToolSettings.Instance.ApplyHDRControl ? component.ApplyDithering : false;
+				component.BlendAmount = ToolSettings.Instance.ApplyColorGrading ? component.BlendAmount : 0.0f;
+				component.LutTexture = ToolSettings.Instance.ApplyColorGrading ? component.LutTexture : null;
 			}
 
 			var width = ToolSettings.Instance.Resolution.TargetWidth;
@@ -72,6 +85,7 @@ namespace AmplifyColor
 			text.Apply();
 			RenderTexture.active = activert;
 			var colors = text.GetPixels( 0, 0, width, height );
+			Texture2D.DestroyImmediate( text );
 
 			var colordata = new Color[ width, height ];
 
@@ -84,10 +98,14 @@ namespace AmplifyColor
 				}
 			}
 
-			if ( !ToolSettings.Instance.ApplyLUT )
+			if ( component != null )
 			{
-				if ( component != null )
-					component.enabled = enabled;
+				component.Tonemapper = prevTonemapper;
+				component.Exposure = prevExposure;
+				component.LinearWhitePoint = prevLinearWhitePoint;
+				component.ApplyDithering = prevApplyDithering;
+				component.BlendAmount = prevBlendAmount;
+				component.LutTexture = prevLUT;
 			}
 
 			imageResult = new ImageResult( colordata );

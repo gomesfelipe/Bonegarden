@@ -1,4 +1,4 @@
-﻿// Amplify Color - Advanced Color Grading for Unity Pro
+// Amplify Color - Advanced Color Grading for Unity
 // Copyright (c) Amplify Creations, Lda <info@amplify.pt>
 
 using UnityEditor;
@@ -9,7 +9,8 @@ namespace AmplifyColor
 	{
 		private static readonly ToolSettings _instance = new ToolSettings();
 		public bool AddLut = true;
-		public bool ApplyLUT;
+		public bool ApplyHDRControl = true;
+		public bool ApplyColorGrading = false;
 		public string FilePath = "";
 
 		public string Host = "localhost";

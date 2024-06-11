@@ -2,8 +2,7 @@ Shader "Hidden/Time of Day/Cloud Shadows"
 {
 	Properties
 	{
-		_MainTex ("Base (RGB)", 2D) = "white" {}
-		_CloudTex ("Alpha Layers (RGB)", 2D) = "white" {}
+		_MainTex ("Base", 2D) = "white" {}
 	}
 
 	CGINCLUDE
@@ -12,29 +11,26 @@ Shader "Hidden/Time of Day/Cloud Shadows"
 	#include "TOD_Clouds.cginc"
 
 	uniform sampler2D _MainTex;
-	uniform sampler2D _CloudTex;
 	uniform sampler2D_float _CameraDepthTexture;
 
 	uniform float4x4 _FrustumCornersWS;
 	uniform float4 _MainTex_TexelSize;
-	uniform float _Cutoff;
-	uniform float _Fade;
-	uniform float _Intensity;
+	uniform float4 _MainTex_ST;
+	uniform float4 _CameraDepthTexture_ST;
 
-	struct v2f {
+	struct v2f
+	{
 		float4 pos       : SV_POSITION;
 		float2 uv        : TEXCOORD0;
 		float2 uv_depth  : TEXCOORD1;
-		float3 cameraRay : TEXCOORD2;
+		float4 cameraRay : TEXCOORD2;
 	};
 
-	v2f vert(appdata_img v) {
+	v2f vert(appdata_img v)
+	{
 		v2f o;
 
-		half index = v.vertex.z;
-		v.vertex.z = 0.1;
-
-		o.pos = mul(UNITY_MATRIX_MVP, v.vertex);
+		o.pos = TOD_TRANSFORM_VERT(v.vertex);
 
 		o.uv       = v.texcoord.xy;
 		o.uv_depth = v.texcoord.xy;
@@ -44,29 +40,24 @@ Shader "Hidden/Time of Day/Cloud Shadows"
 			o.uv.y = 1-o.uv.y;
 		#endif
 
-		o.cameraRay = _FrustumCornersWS[(int)index];
+		int frustumIndex = v.texcoord.x + (2 * o.uv.y);
+		o.cameraRay = _FrustumCornersWS[frustumIndex];
+		o.cameraRay.w = frustumIndex;
 
 		return o;
 	}
 
-	half4 frag(v2f i) : COLOR {
-		half4 sceneColor = tex2D(_MainTex, i.uv);
+	half4 frag(v2f i) : COLOR
+	{
+		half4 sceneColor = tex2D(_MainTex, TOD_UV(i.uv, _MainTex_ST));
 
-		float rawDepth = SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, i.uv_depth);
+		float rawDepth = SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, TOD_UV(i.uv_depth, _CameraDepthTexture_ST));
 		float depth = Linear01Depth(rawDepth);
-		float3 cameraToWorldPos = depth * i.cameraRay;
-		float3 worldPos = _WorldSpaceCameraPos + cameraToWorldPos;
-		float3 skyPos = mul((float3x3)TOD_World2Sky, worldPos);
+		float4 cameraToWorldPos = depth * i.cameraRay;
 
-		float3 vertnorm = TOD_LocalLightDirection;
-		float3 cloudPos = CloudPosition(vertnorm);
+		half a = CloudShadow(cameraToWorldPos);
 
-		float4 cloudUV = 0;
-		cloudUV.xy = skyPos.xz + TOD_CloudWind.xz;
-		cloudUV.zw = mul(TOD_ROTATION_UV(radians(10.0)), skyPos.xz) + TOD_CloudWind.xz;
-
-		half a = TOD_CloudOpacity * CloudShadow(_CloudTex, cloudUV);
-		a *= smoothstep(_Cutoff, _Cutoff + _Fade, Luminance(sceneColor.rgb)) * _Intensity;
+		a *= smoothstep(TOD_CloudShadowCutoff, TOD_CloudShadowCutoff + TOD_CloudShadowFade, Luminance(sceneColor.rgb)) * TOD_CloudShadowIntensity;
 
 		if (depth == 1)
 		{

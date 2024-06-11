@@ -3,27 +3,12 @@ using System.Collections;
 using DG.Tweening;
 using UnityEngine.SceneManagement;
 
-public class FaderBehaviour : MonoBehaviour
+public class FaderBehaviour : Singleton<FaderBehaviour>
 {
 
     public CanvasGroup Fader;
 
     private bool _isFirst;
-
-    private static FaderBehaviour _instance;
-
-    void Awake()
-    {
-        DontDestroyOnLoad(gameObject);
-        _instance = this;
-
-        if (!_isFirst)
-        {
-            _isFirst = true;
-            Fader.alpha = 1;
-            Invoke("LoadMainMenu", 2);
-        }
-    }
 
     void LoadMainMenu()
     {

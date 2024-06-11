@@ -1,7 +1,3 @@
-#if UNITY_4_0||UNITY_4_1||UNITY_4_2||UNITY_4_3||UNITY_4_4||UNITY_4_5||UNITY_4_6||UNITY_4_7||UNITY_4_8||UNITY_4_9
-#define UNITY_4
-#endif
-
 using UnityEngine;
 
 /// Moon position types.
@@ -22,33 +18,25 @@ public enum TOD_StarsPositionType
 public enum TOD_FogType
 {
 	None,
-	Color,
-	Directional
+	Atmosphere,
+	Directional,
+	Gradient
 }
 
 /// Ambient light types.
 public enum TOD_AmbientType
 {
-#if UNITY_4
-	None,
-	Color
-#else
 	None,
 	Color,
 	Gradient,
 	Spherical
-#endif
 }
 
 /// Reflection cubemap types.
 public enum TOD_ReflectionType
 {
-#if UNITY_4
-	None
-#else
 	None,
 	Cubemap
-#endif
 }
 
 /// Color space types.

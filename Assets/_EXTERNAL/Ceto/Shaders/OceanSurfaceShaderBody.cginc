@@ -1,3 +1,5 @@
+// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+
 #ifndef CETO_SURFACESHADER_BODY_INCLUDED
 #define CETO_SURFACESHADER_BODY_INCLUDED
 
@@ -41,7 +43,7 @@ void OceanVert(inout appdata_ceto v, out Input OUT)
 	OUT.wPos = float4(v.vertex.xyz, COMPUTE_DEPTH_01);
 	OUT.texUV = uv;
 
-	float4 screenPos = mul(UNITY_MATRIX_MVP, v.vertex);
+	float4 screenPos = UnityObjectToClipPos(v.vertex);
 
 	float4 screenUV = ComputeScreenPos(screenPos);
 	screenUV = UNITY_PROJ_COORD(screenUV);

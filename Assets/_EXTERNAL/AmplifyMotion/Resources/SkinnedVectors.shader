@@ -1,3 +1,5 @@
+// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+
 // Amplify Motion - Full-scene Motion Blur for Unity Pro
 // Copyright (c) Amplify Creations, Lda <info@amplify.pt>
 
@@ -42,8 +44,8 @@ Shader "Hidden/Amplify Motion/SkinnedVectors" {
 				v2f o;
 				UNITY_INITIALIZE_OUTPUT( v2f, o );
 
-				float4 pos = o.pos = mul( UNITY_MATRIX_MVP, v.vertex );
-				float4 pos_prev = mul( UNITY_MATRIX_MVP, float4( v.prev_vertex, 1 ) );
+				float4 pos = o.pos = UnityObjectToClipPos( v.vertex );
+				float4 pos_prev = UnityObjectToClipPos( float4( v.prev_vertex, 1 ) );
 				float4 pos_curr = o.pos;
 
 			#if UNITY_UV_STARTS_AT_TOP

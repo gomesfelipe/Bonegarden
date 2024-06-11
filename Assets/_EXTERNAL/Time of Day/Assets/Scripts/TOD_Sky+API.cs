@@ -1,20 +1,12 @@
-#if UNITY_4_0||UNITY_4_1||UNITY_4_2||UNITY_4_3||UNITY_4_4||UNITY_4_5||UNITY_4_6||UNITY_4_7||UNITY_4_8||UNITY_4_9
-#define UNITY_4
-#endif
-
 using UnityEngine;
-#if !UNITY_4
 using UnityEngine.Rendering;
-#endif
 using System.Collections.Generic;
 
 public partial class TOD_Sky : MonoBehaviour
 {
 	private static List<TOD_Sky> instances = new List<TOD_Sky>();
 
-	#if !UNITY_4
 	private int probeRenderID = -1;
-	#endif
 
 	//
 	// Static properties
@@ -414,13 +406,11 @@ public partial class TOD_Sky : MonoBehaviour
 		get; private set;
 	}
 
-	#if !UNITY_4
 	/// Current reflection probe.
 	public ReflectionProbe Probe
 	{
 		get; private set;
 	}
-	#endif
 
 	//
 	// Class methods
@@ -482,9 +472,17 @@ public partial class TOD_Sky : MonoBehaviour
 		return color;
 	}
 
-	#if !UNITY_4
 	/// Render the sky dome to 3rd order spherical harmonics.
 	public SphericalHarmonicsL2 RenderToSphericalHarmonics()
+	{
+		float saturation = Ambient.Saturation;
+		float intensity  = Mathf.Lerp(Night.AmbientMultiplier, Day.AmbientMultiplier, LerpValue);
+
+		return RenderToSphericalHarmonics(intensity, saturation);
+	}
+
+	/// Render the sky dome to 3rd order spherical harmonics.
+	public SphericalHarmonicsL2 RenderToSphericalHarmonics(float intensity, float saturation)
 	{
 		var sh = new SphericalHarmonicsL2();
 
@@ -494,90 +492,96 @@ public partial class TOD_Sky : MonoBehaviour
 		const float scale2 = 2f / 7f;
 		const float scale3 = 3f / 7f;
 
-		var amb = TOD_Util.ChangeSaturation(AmbientColor.linear, Ambient.Saturation);
-
+		var ground = TOD_Util.AdjustRGB(AmbientColor.linear, intensity, saturation);
 		var halfway = new Vector3(0.61237243569579f, 0.5f, 0.61237243569579f);
 
 		// Top
 		{
 			var dir = Vector3.up;
-			var col = SampleAtmosphere(dir, directLight).linear;
+			var sky = SampleAtmosphere(dir, directLight).linear;
+			var col = TOD_Util.AdjustRGB(sky, intensity, saturation);
 			sh.AddDirectionalLight(dir, col, scale3);
 		}
 
 		// Upper
 		{
 			var dir = new Vector3(-halfway.x, +halfway.y, -halfway.z);
-			var col = TOD_Util.ChangeSaturation(SampleAtmosphere(dir, directLight).linear, Ambient.Saturation);
+			var sky = SampleAtmosphere(dir, directLight).linear;
+			var col = TOD_Util.AdjustRGB(sky, intensity, saturation);
 			sh.AddDirectionalLight(dir, col, scale2);
 		}
 		{
 			var dir = new Vector3(+halfway.x, +halfway.y, -halfway.z);
-			var col = TOD_Util.ChangeSaturation(SampleAtmosphere(dir, directLight).linear, Ambient.Saturation);
+			var sky = SampleAtmosphere(dir, directLight).linear;
+			var col = TOD_Util.AdjustRGB(sky, intensity, saturation);
 			sh.AddDirectionalLight(dir, col, scale2);
 		}
 		{
 			var dir = new Vector3(-halfway.x, +halfway.y, +halfway.z);
-			var col = TOD_Util.ChangeSaturation(SampleAtmosphere(dir, directLight).linear, Ambient.Saturation);
+			var sky = SampleAtmosphere(dir, directLight).linear;
+			var col = TOD_Util.AdjustRGB(sky, intensity, saturation);
 			sh.AddDirectionalLight(dir, col, scale2);
 		}
 		{
 			var dir = new Vector3(+halfway.x, +halfway.y, +halfway.z);
-			var col = TOD_Util.ChangeSaturation(SampleAtmosphere(dir, directLight).linear, Ambient.Saturation);
+			var sky = SampleAtmosphere(dir, directLight).linear;
+			var col = TOD_Util.AdjustRGB(sky, intensity, saturation);
 			sh.AddDirectionalLight(dir, col, scale2);
 		}
 
 		// Equator
 		{
 			var dir = Vector3.left;
-			var col = TOD_Util.ChangeSaturation(SampleAtmosphere(dir, directLight).linear, Ambient.Saturation);
+			var sky = SampleAtmosphere(dir, directLight).linear;
+			var col = TOD_Util.AdjustRGB(sky, intensity, saturation);
 			sh.AddDirectionalLight(dir, col, scale1);
 		}
 		{
 			var dir = Vector3.right;
-			var col = TOD_Util.ChangeSaturation(SampleAtmosphere(dir, directLight).linear, Ambient.Saturation);
+			var sky = SampleAtmosphere(dir, directLight).linear;
+			var col = TOD_Util.AdjustRGB(sky, intensity, saturation);
 			sh.AddDirectionalLight(dir, col, scale1);
 		}
 		{
 			var dir = Vector3.back;
-			var col = TOD_Util.ChangeSaturation(SampleAtmosphere(dir, directLight).linear, Ambient.Saturation);
+			var sky = SampleAtmosphere(dir, directLight).linear;
+			var col = TOD_Util.AdjustRGB(sky, intensity, saturation);
 			sh.AddDirectionalLight(dir, col, scale1);
 		}
 		{
 			var dir = Vector3.forward;
-			var col = TOD_Util.ChangeSaturation(SampleAtmosphere(dir, directLight).linear, Ambient.Saturation);
+			var sky = SampleAtmosphere(dir, directLight).linear;
+			var col = TOD_Util.AdjustRGB(sky, intensity, saturation);
 			sh.AddDirectionalLight(dir, col, scale1);
 		}
 
 		// Lower
 		{
 			var dir = new Vector3(-halfway.x, -halfway.y, -halfway.z);
-			sh.AddDirectionalLight(dir, amb, scale2);
+			sh.AddDirectionalLight(dir, ground, scale2);
 		}
 		{
 			var dir = new Vector3(+halfway.x, -halfway.y, -halfway.z);
-			sh.AddDirectionalLight(dir, amb, scale2);
+			sh.AddDirectionalLight(dir, ground, scale2);
 		}
 		{
 			var dir = new Vector3(-halfway.x, -halfway.y, +halfway.z);
-			sh.AddDirectionalLight(dir, amb, scale2);
+			sh.AddDirectionalLight(dir, ground, scale2);
 		}
 		{
 			var dir = new Vector3(+halfway.x, -halfway.y, +halfway.z);
-			sh.AddDirectionalLight(dir, amb, scale2);
+			sh.AddDirectionalLight(dir, ground, scale2);
 		}
 
 		// Bottom
 		{
 			var dir = Vector3.down;
-			sh.AddDirectionalLight(dir, amb, scale3);
+			sh.AddDirectionalLight(dir, ground, scale3);
 		}
 
 		return sh;
 	}
-	#endif
 
-	#if !UNITY_4
 	/// Render the sky dome to a cubemap render texture.
 	/// \param targetTexture Target RenderTexture in which rendering should be done.
 	public void RenderToCubemap(RenderTexture targetTexture = null)
@@ -600,10 +604,16 @@ public partial class TOD_Sky : MonoBehaviour
 			Probe.cullingMask = Reflection.CullingMask;
 			Probe.refreshMode = ReflectionProbeRefreshMode.ViaScripting;
 			Probe.timeSlicingMode = Reflection.TimeSlicing;
+			Probe.resolution = Mathf.ClosestPowerOfTwo(Reflection.Resolution);
+			if (Components.Camera != null)
+			{
+				Probe.backgroundColor = Components.Camera.BackgroundColor;
+				Probe.nearClipPlane = Components.Camera.NearClipPlane;
+				Probe.farClipPlane = Components.Camera.FarClipPlane;
+			}
 			probeRenderID = Probe.RenderProbe(targetTexture);
 		}
 	}
-	#endif
 
 	/// Calculate the fog color.
 	/// \param directLight Whether or not to include direct light.
@@ -643,7 +653,7 @@ public partial class TOD_Sky : MonoBehaviour
 			case TOD_FogType.None:
 				break;
 
-			case TOD_FogType.Color:
+			case TOD_FogType.Atmosphere:
 				var fogColor = SampleFogColor(false);
 
 				#if UNITY_EDITOR
@@ -664,21 +674,29 @@ public partial class TOD_Sky : MonoBehaviour
 					RenderSettings.fogColor = fogColorDirectional;
 				}
 				break;
+
+			case TOD_FogType.Gradient:
+				#if UNITY_EDITOR
+				if (RenderSettings.fogColor != FogColor)
+				#endif
+				{
+					RenderSettings.fogColor = FogColor;
+				}
+				break;
 		}
 	}
 
 	/// Update the RenderSettings ambient light according to TOD_AmbientParameters.
 	public void UpdateAmbient()
 	{
-		#if !UNITY_4
 		float saturation = Ambient.Saturation;
 		float intensity  = Mathf.Lerp(Night.AmbientMultiplier, Day.AmbientMultiplier, LerpValue);
-
-		var ambientColor = TOD_Util.ChangeSaturation(AmbientColor, Ambient.Saturation);
 
 		switch (Ambient.Mode)
 		{
 			case TOD_AmbientType.Color:
+				var ambientColor = TOD_Util.AdjustRGB(AmbientColor, intensity, saturation);
+
 				#if UNITY_EDITOR
 				if (RenderSettings.ambientMode != AmbientMode.Flat)
 				#endif
@@ -702,8 +720,9 @@ public partial class TOD_Sky : MonoBehaviour
 				break;
 
 			case TOD_AmbientType.Gradient:
-				var equatorColor = TOD_Util.ChangeSaturation(SampleEquatorColor(), saturation);
-				var skyColor     = TOD_Util.ChangeSaturation(SampleSkyColor(), saturation);
+				var groundColor  = TOD_Util.AdjustRGB(AmbientColor, intensity, saturation);
+				var equatorColor = TOD_Util.AdjustRGB(SampleEquatorColor(), intensity, saturation);
+				var skyColor     = TOD_Util.AdjustRGB(SampleSkyColor(), intensity, saturation);
 
 				#if UNITY_EDITOR
 				if (RenderSettings.ambientMode != AmbientMode.Trilight)
@@ -727,10 +746,10 @@ public partial class TOD_Sky : MonoBehaviour
 				}
 
 				#if UNITY_EDITOR
-				if (RenderSettings.ambientGroundColor != ambientColor)
+				if (RenderSettings.ambientGroundColor != groundColor)
 				#endif
 				{
-					RenderSettings.ambientGroundColor = ambientColor;
+					RenderSettings.ambientGroundColor = groundColor;
 				}
 
 				#if UNITY_EDITOR
@@ -742,6 +761,8 @@ public partial class TOD_Sky : MonoBehaviour
 				break;
 
 			case TOD_AmbientType.Spherical:
+				var fallbackColor = TOD_Util.AdjustRGB(AmbientColor, intensity, saturation);
+
 				#if UNITY_EDITOR
 				if (RenderSettings.ambientMode != AmbientMode.Skybox)
 				#endif
@@ -750,10 +771,10 @@ public partial class TOD_Sky : MonoBehaviour
 				}
 
 				#if UNITY_EDITOR
-				if (RenderSettings.ambientLight != ambientColor)
+				if (RenderSettings.ambientLight != fallbackColor)
 				#endif
 				{
-					RenderSettings.ambientLight = ambientColor;
+					RenderSettings.ambientLight = fallbackColor;
 				}
 
 				#if UNITY_EDITOR
@@ -763,33 +784,14 @@ public partial class TOD_Sky : MonoBehaviour
 					RenderSettings.ambientIntensity = intensity;
 				}
 
-				RenderSettings.ambientProbe = RenderToSphericalHarmonics();
+				RenderSettings.ambientProbe = RenderToSphericalHarmonics(intensity, saturation);
 				break;
 		}
-		#else
-		float saturation = Ambient.Saturation;
-		float intensity  = Mathf.Lerp(Night.AmbientMultiplier, Day.AmbientMultiplier, LerpValue);
-
-		var ambientColor = TOD_Util.MulRGB(TOD_Util.ChangeSaturation(AmbientColor, saturation), intensity);
-
-		switch (Ambient.Mode)
-		{
-			case TOD_AmbientType.Color:
-				#if UNITY_EDITOR
-				if (RenderSettings.ambientLight != ambientColor)
-				#endif
-				{
-					RenderSettings.ambientLight = ambientColor;
-				}
-				break;
-		}
-		#endif
 	}
 
 	/// Update the RenderSettings reflection probe according to TOD_ReflectionParameters.
 	public void UpdateReflection()
 	{
-		#if !UNITY_4
 		switch (Reflection.Mode)
 		{
 			case TOD_ReflectionType.Cubemap:
@@ -815,17 +817,43 @@ public partial class TOD_Sky : MonoBehaviour
 				}
 				break;
 		}
-		#endif
 	}
 
 	/// Load parameters at runtime.
 	/// \param xml The parameters to load, serialized to XML.
 	public void LoadParameters(string xml)
 	{
-		var serializer = new System.Xml.Serialization.XmlSerializer(typeof(TOD_Parameters));
-		var reader = new System.Xml.XmlTextReader(new System.IO.StringReader(xml));
-		var parameters = serializer.Deserialize(reader) as TOD_Parameters;
+		using (var stringReader = new System.IO.StringReader(xml))
+		{
+			using (var textReader = new System.Xml.XmlTextReader(stringReader))
+			{
+				var serializer = new System.Xml.Serialization.XmlSerializer(typeof(TOD_Parameters));
+				var parameters = serializer.Deserialize(textReader) as TOD_Parameters;
 
-		parameters.ToSky(this);
+				parameters.ToSky(this);
+			}
+		}
+	}
+
+	/// Save parameters at runtime.
+	/// \return The parameters serialized to XML.
+	public string SaveParameters()
+	{
+		var builder = new System.Text.StringBuilder();
+
+		using (var stringWriter = new System.IO.StringWriter(builder))
+		{
+			using (var textWriter = new System.Xml.XmlTextWriter(stringWriter))
+			{
+				textWriter.Formatting = System.Xml.Formatting.Indented;
+
+				var serializer = new System.Xml.Serialization.XmlSerializer(typeof(TOD_Parameters));
+				var parameters = new TOD_Parameters(this);
+
+				serializer.Serialize(textWriter, parameters);
+			}
+		}
+
+		return builder.ToString();
 	}
 }

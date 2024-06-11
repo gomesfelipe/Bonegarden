@@ -1,4 +1,6 @@
-﻿// Upgrade NOTE: replaced '_Object2World' with 'unity_ObjectToWorld'
+﻿// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+
+// Upgrade NOTE: replaced '_Object2World' with 'unity_ObjectToWorld'
 
 Shader "Ceto/OceanDepth" 
 {
@@ -28,7 +30,7 @@ Shader "Ceto/OceanDepth"
 			v2f vert (appdata_base v) 
 			{
 			    v2f o;
-			    o.pos = mul (UNITY_MATRIX_MVP, v.vertex);
+			    o.pos = UnityObjectToClipPos (v.vertex);
 			    
 				float3 worldPos = mul(unity_ObjectToWorld, v.vertex);
 				
@@ -76,7 +78,7 @@ Shader "Ceto/OceanDepth"
 			v2f vert (appdata_base v) 
 			{
 			    v2f o;
-			    o.pos = mul (UNITY_MATRIX_MVP, v.vertex);
+			    o.pos = UnityObjectToClipPos (v.vertex);
 			    
 				float3 worldPos = mul(unity_ObjectToWorld, v.vertex);
 				
@@ -126,7 +128,7 @@ Shader "Ceto/OceanDepth"
 			    v2f o;
 			    TreeVertBark(v);
 			    
-			    o.pos = mul (UNITY_MATRIX_MVP, v.vertex);
+			    o.pos = UnityObjectToClipPos (v.vertex);
 			    
 				float3 worldPos = mul(unity_ObjectToWorld, v.vertex);
 				
@@ -177,7 +179,7 @@ Shader "Ceto/OceanDepth"
 			    v2f o;
 			    TreeVertLeaf(v);
 			    
-			    o.pos = mul (UNITY_MATRIX_MVP, v.vertex);
+			    o.pos = UnityObjectToClipPos (v.vertex);
 			    
 				float3 worldPos = mul(unity_ObjectToWorld, v.vertex);
 				
@@ -234,7 +236,7 @@ Shader "Ceto/OceanDepth"
 			    v2f o;
 			    TerrainAnimateTree(v.vertex, v.color.w);
 			    
-			    o.pos = mul (UNITY_MATRIX_MVP, v.vertex);
+			    o.pos = UnityObjectToClipPos (v.vertex);
 			    
 				float3 worldPos = mul(unity_ObjectToWorld, v.vertex);
 				
@@ -292,7 +294,7 @@ Shader "Ceto/OceanDepth"
 			    v2f o;
 			    TerrainAnimateTree(v.vertex, v.color.w);
 			    
-			    o.pos = mul (UNITY_MATRIX_MVP, v.vertex);
+			    o.pos = UnityObjectToClipPos (v.vertex);
 			    
 				float3 worldPos = mul(unity_ObjectToWorld, v.vertex);
 				
@@ -347,7 +349,7 @@ Shader "Ceto/OceanDepth"
 			    v2f o;
 			    TerrainBillboardTree(v.vertex, v.texcoord1.xy, v.texcoord.y);
 			    
-			    o.pos = mul (UNITY_MATRIX_MVP, v.vertex);
+			    o.pos = UnityObjectToClipPos (v.vertex);
 			    
 				float3 worldPos = mul(unity_ObjectToWorld, v.vertex);
 				
@@ -406,7 +408,7 @@ Shader "Ceto/OceanDepth"
 			    WavingGrassVert (v);
 			    o.color = v.color;
 			    
-			    o.pos = mul (UNITY_MATRIX_MVP, v.vertex);
+			    o.pos = UnityObjectToClipPos (v.vertex);
 			    
 				float3 worldPos = mul(unity_ObjectToWorld, v.vertex);
 				
@@ -464,7 +466,7 @@ Shader "Ceto/OceanDepth"
 			    WavingGrassBillboardVert (v);
 			    o.color = v.color;
 			    
-			    o.pos = mul (UNITY_MATRIX_MVP, v.vertex);
+			    o.pos = UnityObjectToClipPos (v.vertex);
 			    
 				float3 worldPos = mul(unity_ObjectToWorld, v.vertex);
 				

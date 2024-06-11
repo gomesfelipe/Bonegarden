@@ -1,4 +1,4 @@
-﻿//
+//
 // Procedural Lightning for Unity
 // (c) 2015 Digital Ruby, LLC
 // Source code may be used for personal or commercial projects.
@@ -11,6 +11,9 @@ using System.Collections.Generic;
 
 namespace DigitalRuby.ThunderAndLightning
 {
+    /// <summary>
+    /// Lightning bolt spline script, helps lightning curve around path points
+    /// </summary>
     public class LightningSplineScript : LightningBoltPathScriptBase
     {
         /// <summary>
@@ -18,6 +21,7 @@ namespace DigitalRuby.ThunderAndLightning
         /// </summary>
         public const int MaxSplineGenerations = 5;
 
+        /// <summary>The distance hint for each spline segment. Set to &lt;= 0 to use the generations to determine how many spline segments to use. If &gt; 0, it will be divided by Generations before being applied. This value is a guideline and is approximate, and not uniform on the spline.</summary>
         [Header("Lightning Spline Properties")]
         [Tooltip("The distance hint for each spline segment. Set to <= 0 to use the generations to determine how many spline segments to use. " +
             "If > 0, it will be divided by Generations before being applied. This value is a guideline and is approximate, and not uniform on the spline.")]
@@ -25,7 +29,7 @@ namespace DigitalRuby.ThunderAndLightning
 
         private readonly List<Vector3> prevSourcePoints = new List<Vector3>(new Vector3[] { Vector3.zero });
         private readonly List<Vector3> sourcePoints = new List<Vector3>();
-        private List<Vector3> savedSplinePoints;
+        private List<Vector3> savedSplinePoints = new List<Vector3>();
 
         private int previousGenerations = -1;
         private float previousDistancePerSegment = -1.0f;
@@ -48,27 +52,28 @@ namespace DigitalRuby.ThunderAndLightning
         }
 
         /// <summary>
-        /// Create lightning bolt path parameters
+        /// Start
         /// </summary>
-        /// <returns>Lightning bolt path parameters</returns>
-        protected override LightningBoltParameters OnCreateParameters()
-        {
-            return new LightningBoltPathParameters { Generator = LightningGeneratorPath.PathInstance };
-        }
-
         protected override void Start()
         {
             base.Start();
         }
 
+        /// <summary>
+        /// Update
+        /// </summary>
         protected override void Update()
         {
             base.Update();
         }
 
+        /// <summary>
+        /// Create a lightning bolt
+        /// </summary>
+        /// <param name="parameters">Parameters</param>
         public override void CreateLightningBolt(LightningBoltParameters parameters)
         {
-            if (LightningPath == null || LightningPath.List == null)
+            if (LightningPath == null)
             {
                 return;
             }
@@ -76,7 +81,7 @@ namespace DigitalRuby.ThunderAndLightning
             sourcePoints.Clear();
             try
             {
-                foreach (GameObject obj in LightningPath.List)
+                foreach (GameObject obj in LightningPath)
                 {
                     if (obj != null)
                     {
@@ -93,27 +98,40 @@ namespace DigitalRuby.ThunderAndLightning
             {
                 Debug.LogError("To create spline lightning, you need a lightning path with at least " + PathGenerator.MinPointsForSpline + " points.");
             }
-
-            Generations = parameters.Generations = Mathf.Clamp(Generations, 1, MaxSplineGenerations);
-            LightningBoltPathParameters sp = parameters as LightningBoltPathParameters;
-
-            if (previousGenerations != Generations || previousDistancePerSegment != DistancePerSegmentHint || SourceChanged())
-            {
-                previousGenerations = Generations;
-                previousDistancePerSegment = DistancePerSegmentHint;
-                sp.Points = new List<Vector3>(sourcePoints.Count * Generations);
-                PopulateSpline(sp.Points, sourcePoints, Generations, DistancePerSegmentHint, Camera);
-                prevSourcePoints.Clear();
-                prevSourcePoints.AddRange(sourcePoints);
-                savedSplinePoints = sp.Points;
-            }
             else
             {
-                sp.Points = savedSplinePoints;
-            }
-            sp.SmoothingFactor = (sp.Points.Count - 1) / sourcePoints.Count;
+                Generations = parameters.Generations = Mathf.Clamp(Generations, 1, MaxSplineGenerations);
+                parameters.Points.Clear();
+                if (previousGenerations != Generations || previousDistancePerSegment != DistancePerSegmentHint || SourceChanged())
+                {
+                    previousGenerations = Generations;
+                    previousDistancePerSegment = DistancePerSegmentHint;
+                    PopulateSpline(parameters.Points, sourcePoints, Generations, DistancePerSegmentHint, Camera);
+                    prevSourcePoints.Clear();
+                    prevSourcePoints.AddRange(sourcePoints);
+                    savedSplinePoints.Clear();
+                    savedSplinePoints.AddRange(parameters.Points);
+                }
+                else
+                {
+                    parameters.Points.AddRange(savedSplinePoints);
+                }
 
-            base.CreateLightningBolt(parameters);
+                parameters.SmoothingFactor = (parameters.Points.Count - 1) / sourcePoints.Count;
+
+                base.CreateLightningBolt(parameters);
+            }
+        }
+
+        /// <summary>
+        /// Create a new lightning bolt parameters instance or get from cache
+        /// </summary>
+        /// <returns>LightningBoltParameters</returns>
+        protected override LightningBoltParameters OnCreateParameters()
+        {
+            LightningBoltParameters p = LightningBoltParameters.GetOrCreateParameters();
+            p.Generator = LightningGeneratorPath.PathGeneratorInstance;
+            return p;
         }
 
         /// <summary>
@@ -128,19 +146,19 @@ namespace DigitalRuby.ThunderAndLightning
                 return;
             }
             Generations = Mathf.Clamp(Generations, 1, MaxSplineGenerations);
-            LightningBoltPathParameters pathParameters = CreateParameters() as LightningBoltPathParameters;
+            LightningBoltParameters parameters = CreateParameters();
+            parameters.Points.Clear();
             if (spline && points.Count > 3)
             {
-                pathParameters.Points = new List<Vector3>(points.Count * Generations);
-                LightningSplineScript.PopulateSpline(pathParameters.Points, points, Generations, DistancePerSegmentHint, Camera);
-                pathParameters.SmoothingFactor = (pathParameters.Points.Count - 1) / points.Count;
+                LightningSplineScript.PopulateSpline(parameters.Points, points, Generations, DistancePerSegmentHint, Camera);
+                parameters.SmoothingFactor = (parameters.Points.Count - 1) / points.Count;
             }
             else
             {
-                pathParameters.Points = new List<Vector3>(points);
-                pathParameters.SmoothingFactor = 1;
+                parameters.Points.AddRange(points);
+                parameters.SmoothingFactor = 1;
             }
-            base.CreateLightningBolt(pathParameters);
+            base.CreateLightningBolt(parameters);
             CreateLightningBoltsNow();
         }
 

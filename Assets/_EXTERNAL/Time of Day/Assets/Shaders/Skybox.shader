@@ -1,5 +1,3 @@
-// Upgrade NOTE: replaced '_Object2World' with 'unity_ObjectToWorld'
-
 Shader "Time of Day/Skybox"
 {
 	Properties
@@ -12,19 +10,21 @@ Shader "Time of Day/Skybox"
 	#define TOD_SCATTERING_MIE 0
 	#include "TOD_Scattering.cginc"
 
-	struct v2f {
+	struct v2f
+	{
 		float4 position : SV_POSITION;
-		float4 color    : TEXCOORD0;
+		float3 color    : TEXCOORD0;
 	};
 
-	v2f vert(appdata_base v) {
+	v2f vert(appdata_base v)
+	{
 		v2f o;
 
-		o.position = mul(UNITY_MATRIX_MVP, v.vertex);
+		o.position = TOD_TRANSFORM_VERT(v.vertex);
 
-		float3 vertex = normalize(mul((float3x3)TOD_World2Sky, mul((float3x3)unity_ObjectToWorld, v.vertex.xyz)));
+		float3 vertex = normalize(mul((float3x3)TOD_World2Sky, mul((float3x3)TOD_Object2World, v.vertex.xyz)));
 
-		o.color = (vertex.y < 0) ? half4(pow(TOD_GroundColor, TOD_Contrast), 1) : ScatteringColor(vertex.xyz, 1);
+		o.color = (vertex.y < 0) ? pow(TOD_GroundColor, TOD_Contrast) : ScatteringColor(vertex.xyz).rgb;
 
 #if !TOD_OUTPUT_HDR
 		o.color = TOD_HDR2LDR(o.color);
@@ -37,8 +37,9 @@ Shader "Time of Day/Skybox"
 		return o;
 	}
 
-	float4 frag(v2f i) : COLOR {
-		return i.color;
+	float4 frag(v2f i) : COLOR
+	{
+		return half4(i.color, 1);
 	}
 	ENDCG
 
@@ -55,7 +56,6 @@ Shader "Time of Day/Skybox"
 		{
 			Cull Off
 			ZWrite Off
-			ZTest LEqual
 
 			CGPROGRAM
 			#pragma vertex vert

@@ -1,4 +1,4 @@
-﻿// Amplify Color - Advanced Color Grading for Unity Pro
+// Amplify Color - Advanced Color Grading for Unity
 // Copyright (c) Amplify Creations, Lda <info@amplify.pt>
 
 using System;
@@ -42,7 +42,7 @@ namespace AmplifyColor
 				int inLength = BitConverter.ToInt32( buf.Reverse().ToArray(), 0 );
 
 				_stream.Read( buf, 0, 4 );
-				//int inComStatus = BitConverter.ToInt32( buf.Reverse().ToArray(), 0 );	
+				//int inComStatus = BitConverter.ToInt32( buf.Reverse().ToArray(), 0 );
 
 				//Debug.Log("Reading length: " + inLength);
 				//Debug.Log("Reading com status: " + inComStatus);
@@ -65,7 +65,7 @@ namespace AmplifyColor
 			0x02,
 			0x00, 0x00, 0x00, 0x01,
 			0x00, 0x00, 0x00, 0x01,
-			0x00, 0x00, 0x00, 0x01, 
+			0x00, 0x00, 0x00, 0x01,
 			0x01,
 			0x03,
 			0x08,
@@ -144,24 +144,22 @@ namespace AmplifyColor
 				//string result = pp.SendJSCommand("scriptingVersion");
 				string result = SendTestImage( pp );
 
-				/*
-				while ( _stream.DataAvailable )
-				{
-					var buf = new byte[ 4 ];
-					_stream.Read( buf, 0, 4);
-					int inLength = BitConverter.ToInt32( buf.Reverse().ToArray(), 0 );				
-					_stream.Read( buf, 0, 4);
-					int inComStatus = BitConverter.ToInt32( buf.Reverse().ToArray(), 0 );
-					
-					Debug.Log("Reading length: " + inLength);
-					Debug.Log("Reading com status: " + inComStatus);
-				
-					var skip = new byte[ inLength ];
-					_stream.Read( skip, 0, inLength );
-				
-					result += Encoding.UTF8.GetString( skip );
-				}
-				*/
+				//while ( _stream.DataAvailable )
+				//{
+				//	var buf = new byte[ 4 ];
+				//	_stream.Read( buf, 0, 4);
+				//	int inLength = BitConverter.ToInt32( buf.Reverse().ToArray(), 0 );
+				//	_stream.Read( buf, 0, 4);
+				//	int inComStatus = BitConverter.ToInt32( buf.Reverse().ToArray(), 0 );
+				//
+				//	Debug.Log("Reading length: " + inLength);
+				//	Debug.Log("Reading com status: " + inComStatus);
+				//
+				//	var skip = new byte[ inLength ];
+				//	_stream.Read( skip, 0, inLength );
+				//
+				//	result += Encoding.UTF8.GetString( skip );
+				//}
 
 				if ( result.ToLowerInvariant().Contains( "error" ) )
 				{

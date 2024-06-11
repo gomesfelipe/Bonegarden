@@ -19,10 +19,14 @@ Description
 Features
 	
   * Advanced color grading
+  * High-performance and Mobile-ready
   * Semi-automated Photoshop workflow
   * File-based standard workflow
   * Dynamic blending between profiles
   * Texture-based per-pixel masking
+  * Depth-based masking
+  * Filmic tone mapping 
+  * 2D and 3D volume effect triggers  
   
 Supported Platforms
 
@@ -32,7 +36,7 @@ Minimum Requirements
 
   Software
 
-    Unity 3.5.7f6
+    Unity 4.6.8f1
 
 Quick Guide
   

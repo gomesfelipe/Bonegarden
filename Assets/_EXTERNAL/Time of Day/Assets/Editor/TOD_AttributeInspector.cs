@@ -6,18 +6,29 @@ public class TOD_MaxDrawer : PropertyDrawer
 {
 	public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 	{
-		var attr = attribute as TOD_MaxAttribute;
+		label = EditorGUI.BeginProperty(position, label, property);
 
-		EditorGUI.PropertyField(position, property, label);
+		var attr = attribute as TOD_MaxAttribute;
 
 		if (property.propertyType == SerializedPropertyType.Float)
 		{
-			property.floatValue = Mathf.Min(property.floatValue, attr.max);
+			EditorGUI.BeginChangeCheck();
+			float newValue = EditorGUI.FloatField(position, label, property.floatValue);
+			if (EditorGUI.EndChangeCheck()) property.floatValue = Mathf.Min(newValue, attr.max);
+			
 		}
 		else if (property.propertyType == SerializedPropertyType.Integer)
 		{
-			property.intValue = Mathf.Min(property.intValue, Mathf.RoundToInt(attr.max));
+			EditorGUI.BeginChangeCheck();
+			int newValue = EditorGUI.IntField(position, label, property.intValue);
+			if (EditorGUI.EndChangeCheck()) property.intValue = Mathf.Min(newValue, (int)attr.max);
 		}
+		else
+		{
+			EditorGUI.LabelField (position, label.text, "Use TOD_Max with float or int.");
+		}
+
+		EditorGUI.EndProperty();
 	}
 }
 
@@ -26,18 +37,28 @@ public class TOD_MinDrawer : PropertyDrawer
 {
 	public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 	{
-		var attr = attribute as TOD_MinAttribute;
+		label = EditorGUI.BeginProperty(position, label, property);
 
-		EditorGUI.PropertyField(position, property, label);
+		var attr = attribute as TOD_MinAttribute;
 
 		if (property.propertyType == SerializedPropertyType.Float)
 		{
-			property.floatValue = Mathf.Max(property.floatValue, attr.min);
+			EditorGUI.BeginChangeCheck();
+			float newValue = EditorGUI.FloatField(position, label, property.floatValue);
+			if (EditorGUI.EndChangeCheck()) property.floatValue = Mathf.Max(newValue, attr.min);
 		}
 		else if (property.propertyType == SerializedPropertyType.Integer)
 		{
-			property.intValue = Mathf.Max(property.intValue, Mathf.RoundToInt(attr.min));
+			EditorGUI.BeginChangeCheck();
+			int newValue = EditorGUI.IntField(position, label, property.intValue);
+			if (EditorGUI.EndChangeCheck()) property.intValue = Mathf.Max(newValue, (int)attr.min);
 		}
+		else
+		{
+			EditorGUI.LabelField (position, label.text, "Use TOD_Min with float or int.");
+		}
+
+		EditorGUI.EndProperty();
 	}
 }
 
@@ -46,17 +67,27 @@ public class TOD_RangeDrawer : PropertyDrawer
 {
 	public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 	{
-		var attr = attribute as TOD_RangeAttribute;
+		label = EditorGUI.BeginProperty(position, label, property);
 
-		EditorGUI.PropertyField(position, property, label);
+		var attr = attribute as TOD_RangeAttribute;
 
 		if (property.propertyType == SerializedPropertyType.Float)
 		{
-			property.floatValue = Mathf.Clamp(property.floatValue, attr.min, attr.max);
+			EditorGUI.BeginChangeCheck();
+			float newValue = EditorGUI.FloatField(position, label, property.floatValue);
+			if (EditorGUI.EndChangeCheck()) property.floatValue = Mathf.Clamp(newValue, attr.min, attr.max);
 		}
 		else if (property.propertyType == SerializedPropertyType.Integer)
 		{
-			property.intValue = Mathf.Clamp(property.intValue, Mathf.RoundToInt(attr.min), Mathf.RoundToInt(attr.max));
+			EditorGUI.BeginChangeCheck();
+			int newValue = EditorGUI.IntField(position, label, property.intValue);
+			if (EditorGUI.EndChangeCheck()) property.intValue = Mathf.Clamp(newValue, (int)attr.min, (int)attr.max);
 		}
+		else
+		{
+			EditorGUI.LabelField (position, label.text, "Use TOD_Range with float or int.");
+		}
+
+		EditorGUI.EndProperty();
 	}
 }

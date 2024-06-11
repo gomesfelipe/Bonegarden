@@ -2,112 +2,95 @@ Shader "Hidden/Time of Day/Scattering"
 {
 	Properties
 	{
-		_MainTex ("Base (RGB)", 2D) = "white" {}
-		_DitheringTexture ("Dithering Lookup Texture (A)", 2D) = "black" {}
+		_MainTex ("Base", 2D) = "white" {}
+		_SkyMask ("Sky", 2D) = "white" {}
 	}
 
 	CGINCLUDE
 	#include "UnityCG.cginc"
 	#include "TOD_Base.cginc"
 	#include "TOD_Scattering.cginc"
-	#define BAYER_DIM 8.0
 
 	uniform sampler2D _MainTex;
+	uniform sampler2D _SkyMask;
 	uniform sampler2D_float _CameraDepthTexture;
-	uniform sampler2D _DitheringTexture;
 
 	uniform float4x4 _FrustumCornersWS;
 	uniform float4 _MainTex_TexelSize;
-	uniform float4 _Density;
+	uniform float4 _MainTex_ST;
+	uniform float4 _SkyMask_ST;
+	uniform float4 _CameraDepthTexture_ST;
 
-	struct v2f {
+	struct v2f
+	{
 		float4 pos       : SV_POSITION;
 		float2 uv        : TEXCOORD0;
-		float2 uv_depth  : TEXCOORD1;
+		float2 uv_depth  : TEXCOORD2;
 #if TOD_OUTPUT_DITHERING
-		float2 uv_dither : TEXCOORD2;
+		float2 uv_dither : TEXCOORD3;
 #endif
-		float3 cameraRay : TEXCOORD3;
-		float3 skyDir    : TEXCOORD4;
+		float4 cameraRay : TEXCOORD4;
+		TOD_VERTEX_OUTPUT_STEREO
 	};
 
-	v2f vert(appdata_img v) {
+	v2f vert(appdata_img v)
+	{
 		v2f o;
 
-		half index = v.vertex.z;
-		v.vertex.z = 0.1;
-
-		o.pos = mul(UNITY_MATRIX_MVP, v.vertex);
+		o.pos = TOD_TRANSFORM_VERT(v.vertex);
 
 		o.uv        = v.texcoord.xy;
 		o.uv_depth  = v.texcoord.xy;
 
 #if TOD_OUTPUT_DITHERING
-		o.uv_dither = v.texcoord.xy * _ScreenParams.xy * (1.0 / BAYER_DIM);
+		o.uv_dither = DitheringCoords(v.texcoord.xy);
 #endif
 
 #if UNITY_UV_STARTS_AT_TOP
-		if (_MainTex_TexelSize.y < 0) o.uv.y = 1-o.uv.y;
+		if (_MainTex_TexelSize.y < 0)
+			o.uv.y = 1-o.uv.y;
 #endif
 
-		o.cameraRay = _FrustumCornersWS[(int)index];
-		o.skyDir    = normalize(mul((float3x3)TOD_World2Sky, o.cameraRay));
+		int frustumIndex = v.texcoord.x + (2 * o.uv.y);
+		o.cameraRay = _FrustumCornersWS[frustumIndex];
+		o.cameraRay.w = frustumIndex;
 
 		return o;
 	}
 
-	inline float FogDensity(float3 cameraToWorldPos)
+	half4 frag(v2f i) : COLOR
 	{
-		float heightFalloff = _Density.x;
-		float heightDensity = _Density.y;
-		float globalDensity = _Density.z;
+		half4 color = tex2D(_MainTex, TOD_UV(i.uv, _MainTex_ST));
 
-		// Unpack depth value
-		float fogIntensity = length(cameraToWorldPos) * heightDensity;
-
-		// Apply height falloff
-		if (heightFalloff > 0 && abs(cameraToWorldPos.y) > 0.01)
-		{
-			float t = heightFalloff * cameraToWorldPos.y;
-			fogIntensity *= (1.0 - exp(-t)) / t;
-		}
-
-		// Clamp intensity
-		fogIntensity = min(10, globalDensity * fogIntensity);
-
-		return 1.0 - exp(-fogIntensity);
-	}
-
-	half4 frag(v2f i) : COLOR {
-		half4 color = tex2D(_MainTex, i.uv);
-
-		float rawDepth = SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, i.uv_depth);
+		float rawDepth = SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, TOD_UV(i.uv_depth, _CameraDepthTexture_ST));
 		float depth = Linear01Depth(rawDepth);
-		float3 cameraToWorldPos = depth * i.cameraRay;
+		float4 cameraToWorldPos = depth * i.cameraRay;
+		float3 worldPos = _WorldSpaceCameraPos + cameraToWorldPos;
 
-		if (depth != 1) depth = FogDensity(cameraToWorldPos);
-
-		half4 scattering = ScatteringColor(normalize(i.skyDir), depth);
+		half4 mask = tex2D(_SkyMask, TOD_UV(i.uv, _SkyMask_ST));
+		half4 scattering = AtmosphericScattering(i.cameraRay, worldPos, depth, mask);
 
 #if TOD_OUTPUT_DITHERING
-		scattering.rgb += tex2D(_DitheringTexture, i.uv_dither).a * (1.0 / (BAYER_DIM * BAYER_DIM + 1.0));
+		scattering.rgb += DitheringColor(i.uv_dither);
 #endif
 
 #if !TOD_OUTPUT_HDR
-		scattering = TOD_HDR2LDR(scattering);
+		scattering.rgb = TOD_HDR2LDR(scattering.rgb);
 #endif
 
 #if !TOD_OUTPUT_LINEAR
-		scattering = TOD_LINEAR2GAMMA(scattering);
+		scattering.rgb = TOD_LINEAR2GAMMA(scattering.rgb);
 #endif
 
 		if (depth == 1)
 		{
+#if TOD_SCATTERING_SINGLE_PASS
 			color.rgb += scattering.rgb;
+#endif
 		}
 		else
 		{
-			color.rgb = lerp(color.rgb, scattering.rgb, depth);
+			color.rgb = lerp(color.rgb, scattering.rgb, scattering.a);
 		}
 
 		return color;
@@ -127,6 +110,7 @@ Shader "Hidden/Time of Day/Scattering"
 			#pragma multi_compile _ TOD_OUTPUT_HDR
 			#pragma multi_compile _ TOD_OUTPUT_LINEAR
 			#pragma multi_compile _ TOD_OUTPUT_DITHERING
+			#pragma multi_compile _ TOD_SCATTERING_SINGLE_PASS
 			ENDCG
 		}
 	}

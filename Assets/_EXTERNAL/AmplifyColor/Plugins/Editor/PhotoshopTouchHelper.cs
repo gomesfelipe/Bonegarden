@@ -1,4 +1,4 @@
-﻿// Amplify Color - Advanced Color Grading for Unity Pro
+// Amplify Color - Advanced Color Grading for Unity
 // Copyright (c) Amplify Creations, Lda <info@amplify.pt>
 
 using System;
@@ -9,7 +9,7 @@ namespace AmplifyColor
 {
 	public static class PhotoshopTouchHelper
 	{
-		public static bool LoadTexture2DLutFromPhotoshopData( byte[] data, LUTSettings settings, out Texture2D texture )
+		public static bool LoadTexture2DLutFromPhotoshopData( byte[] data, LUTSettings settings, ref Texture2D texture )
 		{
 			int columns = settings.Columns;
 			int rows = settings.Rows;
@@ -68,12 +68,16 @@ namespace AmplifyColor
 
 			lutTexture.SetPixels( lutData );
 			lutTexture.Apply();
+
+			if ( texture != null )
+				Texture2D.DestroyImmediate( texture );
+
 			texture = lutTexture;
 
 			return true;
 		}
 
-		public static bool LoadTexture2DLutFromImage( Texture2D texture, ToolSettings settings, out Texture2D lutTexture )
+		public static bool LoadTexture2DLutFromImage( Texture2D texture, ToolSettings settings, ref Texture2D lutTexture )
 		{
 			var width = settings.Resolution.TargetWidth;
 			var height = settings.Resolution.TargetHeight;
@@ -104,6 +108,10 @@ namespace AmplifyColor
 
 			lutText.SetPixels( lutData );
 			lutText.Apply();
+
+			if ( lutTexture != null )
+				Texture2D.DestroyImmediate( lutTexture );
+
 			lutTexture = lutText;
 
 			return true;

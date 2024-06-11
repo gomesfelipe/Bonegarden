@@ -267,7 +267,7 @@ namespace Ceto
                         data.reflection.cam = null;
                     }
 
-                    CreateRenderTarget(data.reflection, cam.name, cam.pixelWidth, cam.pixelHeight, cam.hdr, data.settings);
+                    CreateRenderTarget(data.reflection, cam.name, cam.pixelWidth, cam.pixelHeight, cam.allowHDR, data.settings);
 
                     //Create the dummy object if null
                     if (m_dummy == null)
@@ -285,7 +285,7 @@ namespace Ceto
                     //Else use normal method.
 
                     CreateReflectionCameraFor(cam, data.reflection);
-                    CreateRenderTarget(data.reflection, cam.name, cam.pixelWidth, cam.pixelHeight, cam.hdr, data.settings);
+                    CreateRenderTarget(data.reflection, cam.name, cam.pixelWidth, cam.pixelHeight, cam.allowHDR, data.settings);
 
                     NotifyOnEvent.Disable = true;
 		            RenderReflectionFor(cam, data.reflection.cam, data.settings);
@@ -343,7 +343,7 @@ namespace Ceto
 	            data.cam.depthTextureMode = DepthTextureMode.None;
 	            data.cam.renderingPath = RenderingPath.Forward;
 	            data.cam.enabled = false;
-	            data.cam.hdr = cam.hdr;
+	            data.cam.allowHDR = cam.allowHDR;
 	            data.cam.targetTexture = null;
 			}
 

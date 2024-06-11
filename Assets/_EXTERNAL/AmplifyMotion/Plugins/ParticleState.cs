@@ -234,7 +234,7 @@ internal class ParticleState : AmplifyMotion.MotionState
 			return;
 		}
 
-		Profiler.BeginSample( "Particle.Update" );
+		UnityEngine.Profiling.Profiler.BeginSample( "Particle.Update" );
 
 		if ( !starting && m_wasVisible )
 		{
@@ -258,7 +258,7 @@ internal class ParticleState : AmplifyMotion.MotionState
 
 			//Size Life Time change module
 			if ( m_curveLifeTimeSize != null )
-				sizeParticle = sizeParticle * m_curveLifeTimeSize.Evaluate( 1 - ( m_particles[ i ].lifetime * rcpStartLifetime ) );
+				sizeParticle = sizeParticle * m_curveLifeTimeSize.Evaluate( 1 - ( m_particles[ i ].remainingLifetime * rcpStartLifetime ) );
 
 			//Size By Speed change module
 			if ( m_curveSpeedSize != null && m_rangeMinSpeedSize > 0f && m_rangeMaxSpeedSize > 0f )
@@ -313,12 +313,12 @@ internal class ParticleState : AmplifyMotion.MotionState
 
 		m_wasVisible = m_meshRenderer.isVisible;
 
-		Profiler.EndSample();
+		UnityEngine.Profiling.Profiler.EndSample();
 	}
 
 	internal override void RenderVectors( Camera camera, float scale, AmplifyMotion.Quality quality )
 	{
-		Profiler.BeginSample( "Particle.Render" );
+		UnityEngine.Profiling.Profiler.BeginSample( "Particle.Render" );
 
 		if ( m_initialized && !m_error && m_meshRenderer.isVisible )
 		{
@@ -360,7 +360,7 @@ internal class ParticleState : AmplifyMotion.MotionState
 			}
 		}
 
-		Profiler.EndSample();
+		UnityEngine.Profiling.Profiler.EndSample();
 	}
 }
 }

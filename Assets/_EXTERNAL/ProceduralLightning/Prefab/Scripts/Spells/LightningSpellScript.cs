@@ -1,4 +1,4 @@
-﻿//
+//
 // Procedural Lightning for Unity
 // (c) 2015 Digital Ruby, LLC
 // Source code may be used for personal or commercial projects.
@@ -11,67 +11,87 @@ using System;
 
 namespace DigitalRuby.ThunderAndLightning
 {
+    /// <summary>
+    /// Base script for lightning bolt spells
+    /// </summary>
     public abstract class LightningSpellScript : MonoBehaviour
     {
+        /// <summary>The start point of the spell. Set this to a muzzle end or hand.</summary>
         [Header("Direction and distance")]
         [Tooltip("The start point of the spell. Set this to a muzzle end or hand.")]
         public GameObject SpellStart;
 
+        /// <summary>The end point of the spell. Set this to an empty game object. This will change depending on things like collisions, randomness, etc. Not all spells need an end object, but create this anyway to be sure.</summary>
         [Tooltip("The end point of the spell. Set this to an empty game object. " +
             "This will change depending on things like collisions, randomness, etc. " +
             "Not all spells need an end object, but create this anyway to be sure.")]
         public GameObject SpellEnd;
 
+        /// <summary>The direction of the spell. Should be normalized. Does not change unless explicitly modified.</summary>
         [HideInInspector]
         [Tooltip("The direction of the spell. Should be normalized. Does not change unless explicitly modified.")]
         public Vector3 Direction;
 
+        /// <summary>The maximum distance of the spell</summary>
         [Tooltip("The maximum distance of the spell")]
         public float MaxDistance = 15.0f;
 
+        /// <summary>Whether the collision is an exploision. If not explosion, collision is directional.</summary>
         [Header("Collision")]
-
         [Tooltip("Whether the collision is an exploision. If not explosion, collision is directional.")]
         public bool CollisionIsExplosion;
 
+        /// <summary>The radius of the collision explosion</summary>
         [Tooltip("The radius of the collision explosion")]
         public float CollisionRadius = 1.0f;
 
+        /// <summary>The force to explode with when there is a collision</summary>
         [Tooltip("The force to explode with when there is a collision")]
         public float CollisionForce = 50.0f;
 
+        /// <summary>Collision force mode</summary>
         [Tooltip("Collision force mode")]
         public ForceMode CollisionForceMode = ForceMode.Impulse;
 
+        /// <summary>The particle system for collisions. For best effects, this should emit particles in bursts at time 0 and not loop.</summary>
         [Tooltip("The particle system for collisions. For best effects, this should emit particles in bursts at time 0 and not loop.")]
         public ParticleSystem CollisionParticleSystem;
 
+        /// <summary>The layers that the spell should collide with</summary>
         [Tooltip("The layers that the spell should collide with")]
         public LayerMask CollisionMask = -1;
 
+        /// <summary>Collision audio source</summary>
         [Tooltip("Collision audio source")]
         public AudioSource CollisionAudioSource;
 
+        /// <summary>Collision audio clips. One will be chosen at random and played one shot with CollisionAudioSource.</summary>
         [Tooltip("Collision audio clips. One will be chosen at random and played one shot with CollisionAudioSource.")]
         public AudioClip[] CollisionAudioClips;
 
+        /// <summary>Collision sound volume range.</summary>
         [Tooltip("Collision sound volume range.")]
         public RangeOfFloats CollisionVolumeRange = new RangeOfFloats { Minimum = 0.4f, Maximum = 0.6f };
 
+        /// <summary>The duration in seconds that the spell will last. Not all spells support a duration. For one shot spells, this is how long the spell cast / emission light, etc. will last.</summary>
         [Header("Duration and Cooldown")]
         [Tooltip("The duration in seconds that the spell will last. Not all spells support a duration. For one shot spells, this is how long the spell cast / emission light, etc. will last.")]
         public float Duration = 0.0f;
 
+        /// <summary>The cooldown in seconds. Once cast, the spell must wait for the cooldown before being cast again.</summary>
         [Tooltip("The cooldown in seconds. Once cast, the spell must wait for the cooldown before being cast again.")]
         public float Cooldown = 0.0f;
 
+        /// <summary>Emission sound</summary>
         [Header("Emission")]
         [Tooltip("Emission sound")]
         public AudioSource EmissionSound;
 
+        /// <summary>Emission particle system. For best results use world space, turn off looping and play on awake.</summary>
         [Tooltip("Emission particle system. For best results use world space, turn off looping and play on awake.")]
         public ParticleSystem EmissionParticleSystem;
 
+        /// <summary>Light to illuminate when spell is cast</summary>
         [Tooltip("Light to illuminate when spell is cast")]
         public Light EmissionLight;
 
@@ -81,7 +101,7 @@ namespace DigitalRuby.ThunderAndLightning
         {
             int token = stopToken;
 
-            yield return new WaitForSeconds(seconds);
+            yield return WaitForSecondsLightning.WaitForSecondsLightningPooled(seconds);
 
             if (token == stopToken)
             {
@@ -99,6 +119,10 @@ namespace DigitalRuby.ThunderAndLightning
         /// </summary>
         protected float CooldownTimer { get; private set; }
 
+        /// <summary>
+        /// Apply collision force at a point
+        /// </summary>
+        /// <param name="point">Point to apply force at</param>
         protected void ApplyCollisionForce(Vector3 point)
         {
             // apply collision force if needed
@@ -129,7 +153,7 @@ namespace DigitalRuby.ThunderAndLightning
         /// <param name="pos">Location of the sound</param>
         protected void PlayCollisionSound(Vector3 pos)
         {
-            if (CollisionAudioSource != null && CollisionAudioClips != null && CollisionAudioClips.Length != 0)
+            if (CollisionAudioSource != null && CollisionAudioClips != null && CollisionAudioClips.Length > 0)
             {
                 int index = UnityEngine.Random.Range(0, CollisionAudioClips.Length - 1);
                 float volume = UnityEngine.Random.Range(CollisionVolumeRange.Minimum, CollisionVolumeRange.Maximum);
@@ -154,8 +178,15 @@ namespace DigitalRuby.ThunderAndLightning
         /// </summary>
         protected virtual void Update()
         {
-            CooldownTimer = Mathf.Max(0.0f, CooldownTimer - Time.deltaTime);
-            DurationTimer = Mathf.Max(0.0f, DurationTimer - Time.deltaTime);
+            CooldownTimer = Mathf.Max(0.0f, CooldownTimer - LightningBoltScript.DeltaTime);
+            DurationTimer = Mathf.Max(0.0f, DurationTimer - LightningBoltScript.DeltaTime);
+        }
+
+        /// <summary>
+        /// Late Update.
+        /// </summary>
+        protected virtual void LateUpdate()
+        {
         }
 
         /// <summary>

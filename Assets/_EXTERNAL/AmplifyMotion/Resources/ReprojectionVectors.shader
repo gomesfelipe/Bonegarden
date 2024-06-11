@@ -1,3 +1,5 @@
+// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+
 
 Shader "Hidden/Amplify Motion/ReprojectionVectors" {
 	Properties {
@@ -32,7 +34,7 @@ Shader "Hidden/Amplify Motion/ReprojectionVectors" {
 				v2f vert( appdata_img v )
 				{
 					v2f o;
-					o.pos = mul( UNITY_MATRIX_MVP, v.vertex );
+					o.pos = UnityObjectToClipPos( v.vertex );
 					o.uv = v.texcoord.xy;
 					o.uv_rt = v.texcoord.xy;
 				#if UNITY_UV_STARTS_AT_TOP

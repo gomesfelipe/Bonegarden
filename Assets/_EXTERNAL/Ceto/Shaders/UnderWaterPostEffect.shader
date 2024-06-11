@@ -1,3 +1,5 @@
+// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+
 Shader "Ceto/UnderWaterPostEffect" 
 {
 	Properties 
@@ -38,7 +40,7 @@ Shader "Ceto/UnderWaterPostEffect"
 		v2f o;
 		half index = v.vertex.z;
 		v.vertex.z = 0.1;
-		o.pos = mul(UNITY_MATRIX_MVP, v.vertex);
+		o.pos = UnityObjectToClipPos(v.vertex);
 		o.uv = v.texcoord.xy;
 		o.uv_depth = v.texcoord.xy;
 		
@@ -56,7 +58,7 @@ Shader "Ceto/UnderWaterPostEffect"
 	v2f vertApplyMask( appdata_img v )
 	{
 		v2f o;
-		o.pos = mul(UNITY_MATRIX_MVP, v.vertex);
+		o.pos = UnityObjectToClipPos(v.vertex);
 		o.uv = v.texcoord.xy;
 		o.uv_depth = v.texcoord.xy;
 		o.interpolatedRay = 0;

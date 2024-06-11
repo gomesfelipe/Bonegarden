@@ -1,11 +1,5 @@
-#if UNITY_4_0||UNITY_4_1||UNITY_4_2||UNITY_4_3||UNITY_4_4||UNITY_4_5||UNITY_4_6||UNITY_4_7||UNITY_4_8||UNITY_4_9
-#define UNITY_4
-#endif
-
 using UnityEngine;
-#if !UNITY_4
 using UnityEngine.Rendering;
-#endif
 using System;
 
 /// All parameters of the sky dome.
@@ -94,7 +88,13 @@ using System;
 		get
 		{
 			var res = new DateTime(0, DateTimeKind.Utc);
-			return res.AddYears(Year-1).AddMonths(Month-1).AddDays(Day-1).AddHours(Hour);
+
+			if (Year  > 0) res = res.AddYears(Year-1);
+			if (Month > 0) res = res.AddMonths(Month-1);
+			if (Day   > 0) res = res.AddDays(Day-1);
+			if (Hour  > 0) res = res.AddHours(Hour);
+
+			return res;
 		}
 		set
 		{
@@ -183,127 +183,43 @@ using System;
 	/// Left value: Sun at zenith.
 	/// Right value: Sun at horizon.
 	[Tooltip("Color of the sun spot.\nLeft value: Sun at zenith.\nRight value: Sun at horizon.")]
-	public Gradient SunColor = new Gradient()
-	{
-		alphaKeys = new GradientAlphaKey[] {
-			new GradientAlphaKey(1.0f, 0.0f),
-			new GradientAlphaKey(1.0f, 0.5f),
-			new GradientAlphaKey(1.0f, 1.0f)
-		},
-		colorKeys = new GradientColorKey[] {
-			new GradientColorKey(new Color32(253, 171, 050, 255), 0.0f),
-			new GradientColorKey(new Color32(253, 171, 050, 255), 0.5f),
-			new GradientColorKey(new Color32(253, 171, 050, 255), 1.0f)
-		}
-	};
+	public Gradient SunColor = null;
 
 	/// Color of the light that hits the ground.
 	/// Left value: Sun at zenith.
 	/// Right value: Sun at horizon.
 	[Tooltip("Color of the light that hits the ground.\nLeft value: Sun at zenith.\nRight value: Sun at horizon.")]
-	public Gradient LightColor = new Gradient()
-	{
-		alphaKeys = new GradientAlphaKey[] {
-			new GradientAlphaKey(1.0f, 0.0f),
-			new GradientAlphaKey(1.0f, 0.5f),
-			new GradientAlphaKey(1.0f, 1.0f)
-		},
-		colorKeys = new GradientColorKey[] {
-			new GradientColorKey(new Color32(255, 243, 234, 255), 0.0f),
-			new GradientColorKey(new Color32(255, 243, 234, 255), 0.5f),
-			new GradientColorKey(new Color32(255, 154, 000, 255), 1.0f)
-		}
-	};
+	public Gradient LightColor = null;
 
 	/// Color of the god rays.
 	/// Left value: Sun at zenith.
 	/// Right value: Sun at horizon.
 	[Tooltip("Color of the god rays.\nLeft value: Sun at zenith.\nRight value: Sun at horizon.")]
-	public Gradient RayColor = new Gradient()
-	{
-		alphaKeys = new GradientAlphaKey[] {
-			new GradientAlphaKey(1.0f, 0.0f),
-			new GradientAlphaKey(1.0f, 0.5f),
-			new GradientAlphaKey(1.0f, 1.0f)
-		},
-		colorKeys = new GradientColorKey[] {
-			new GradientColorKey(new Color32(255, 243, 234, 255), 0.0f),
-			new GradientColorKey(new Color32(255, 243, 234, 255), 0.5f),
-			new GradientColorKey(new Color32(255, 154, 000, 255), 1.0f)
-		}
-	};
+	public Gradient RayColor = null;
 
 	/// Color of the light that hits the atmosphere.
 	/// Left value: Sun at zenith.
 	/// Right value: Sun at horizon.
 	[Tooltip("Color of the light that hits the atmosphere.\nLeft value: Sun at zenith.\nRight value: Sun at horizon.")]
-	public Gradient SkyColor = new Gradient()
-	{
-		alphaKeys = new GradientAlphaKey[] {
-			new GradientAlphaKey(1.0f, 0.0f),
-			new GradientAlphaKey(1.0f, 0.5f),
-			new GradientAlphaKey(1.0f, 1.0f)
-		},
-		colorKeys = new GradientColorKey[] {
-			new GradientColorKey(new Color32(255, 243, 234, 255), 0.0f),
-			new GradientColorKey(new Color32(255, 243, 234, 255), 0.5f),
-			new GradientColorKey(new Color32(255, 243, 234, 255), 1.0f)
-		}
-	};
+	public Gradient SkyColor = null;
 
 	/// Color of the clouds.
 	/// Left value: Sun at zenith.
 	/// Right value: Sun at horizon.
 	[Tooltip("Color of the clouds.\nLeft value: Sun at zenith.\nRight value: Sun at horizon.")]
-	public Gradient CloudColor = new Gradient()
-	{
-		alphaKeys = new GradientAlphaKey[] {
-			new GradientAlphaKey(1.0f, 0.0f),
-			new GradientAlphaKey(1.0f, 0.5f),
-			new GradientAlphaKey(1.0f, 1.0f)
-		},
-		colorKeys = new GradientColorKey[] {
-			new GradientColorKey(new Color32(224, 235, 255, 255), 0.0f),
-			new GradientColorKey(new Color32(224, 235, 255, 255), 0.5f),
-			new GradientColorKey(new Color32(255, 195, 145, 255), 1.0f)
-		}
-	};
+	public Gradient CloudColor = null;
 
 	/// Color of the atmosphere fog.
-	/// Left value: Sun at horizon.
-	/// Right value: Sun opposite to zenith.
-	[Tooltip("Color of the atmosphere fog.\nLeft value: Sun at horizon.\nRight value: Sun opposite to zenith.")]
-	public Gradient FogColor = new Gradient()
-	{
-		alphaKeys = new GradientAlphaKey[] {
-			new GradientAlphaKey(1.0f, 0.0f),
-			new GradientAlphaKey(1.0f, 0.5f),
-			new GradientAlphaKey(1.0f, 1.0f)
-		},
-		colorKeys = new GradientColorKey[] {
-			new GradientColorKey(new Color32(191, 191, 191, 255), 0.0f),
-			new GradientColorKey(new Color32(191, 191, 191, 255), 0.5f),
-			new GradientColorKey(new Color32(127, 127, 127, 255), 1.0f)
-		}
-	};
+	/// Left value: Sun at zenith.
+	/// Right value: Sun at horizon.
+	[Tooltip("Color of the atmosphere fog.\nLeft value: Sun at zenith.\nRight value: Sun at horizon.")]
+	public Gradient FogColor = null;
 
 	/// Color of the ambient light.
 	/// Left value: Sun at zenith.
 	/// Right value: Sun at horizon.
 	[Tooltip("Color of the ambient light.\nLeft value: Sun at zenith.\nRight value: Sun at horizon.")]
-	public Gradient AmbientColor = new Gradient()
-	{
-		alphaKeys = new GradientAlphaKey[] {
-			new GradientAlphaKey(1.0f, 0.0f),
-			new GradientAlphaKey(1.0f, 0.5f),
-			new GradientAlphaKey(1.0f, 1.0f)
-		},
-		colorKeys = new GradientColorKey[] {
-			new GradientColorKey(new Color32(094, 089, 087, 255), 0.0f),
-			new GradientColorKey(new Color32(094, 089, 087, 255), 0.5f),
-			new GradientColorKey(new Color32(094, 089, 087, 255), 1.0f)
-		}
-	};
+	public Gradient AmbientColor = null;
 
 	/// [0, 8]
 	/// Intensity of the light source.
@@ -318,7 +234,7 @@ using System;
 	/// [0, 1]
 	/// Brightness multiplier of the ambient light.
 	[Tooltip("Brightness multiplier of the ambient light.")]
-	[Range(0f, 1f)] public float AmbientMultiplier = 1.0f;
+	[Range(0f, 8f)] public float AmbientMultiplier = 1.0f;
 
 	/// [0, 1]
 	/// Brightness multiplier of the reflection probe.
@@ -334,132 +250,48 @@ using System;
 	/// Left value: Sun at horizon.
 	/// Right value: Sun opposite to zenith.
 	[Tooltip("Color of the moon mesh.\nLeft value: Sun at horizon.\nRight value: Sun opposite to zenith.")]
-	public Gradient MoonColor = new Gradient()
-	{
-		alphaKeys = new GradientAlphaKey[] {
-			new GradientAlphaKey(1.0f, 0.0f),
-			new GradientAlphaKey(1.0f, 0.5f),
-			new GradientAlphaKey(1.0f, 1.0f)
-		},
-		colorKeys = new GradientColorKey[] {
-			new GradientColorKey(new Color32(255, 233, 200, 255), 0.0f),
-			new GradientColorKey(new Color32(255, 233, 200, 255), 0.5f),
-			new GradientColorKey(new Color32(255, 233, 200, 255), 1.0f)
-		}
-	};
+	public Gradient MoonColor = null;
 
 	/// Color of the light that hits the ground.
 	/// Left value: Sun at horizon.
 	/// Right value: Sun opposite to zenith.
 	[Tooltip("Color of the light that hits the ground.\nLeft value: Sun at horizon.\nRight value: Sun opposite to zenith.")]
-	public Gradient LightColor = new Gradient()
-	{
-		alphaKeys = new GradientAlphaKey[] {
-			new GradientAlphaKey(1.0f, 0.0f),
-			new GradientAlphaKey(1.0f, 0.5f),
-			new GradientAlphaKey(1.0f, 1.0f)
-		},
-		colorKeys = new GradientColorKey[] {
-			new GradientColorKey(new Color32(025, 040, 065, 255), 0.0f),
-			new GradientColorKey(new Color32(025, 040, 065, 255), 0.5f),
-			new GradientColorKey(new Color32(025, 040, 065, 255), 1.0f)
-		}
-	};
+	public Gradient LightColor = null;
 
 	/// Color of the god rays.
 	/// Left value: Sun at horizon.
 	/// Right value: Sun opposite to zenith.
 	[Tooltip("Color of the god rays.\nLeft value: Sun at horizon.\nRight value: Sun opposite to zenith.")]
-	public Gradient RayColor = new Gradient()
-	{
-		alphaKeys = new GradientAlphaKey[] {
-			new GradientAlphaKey(1.0f, 0.0f),
-			new GradientAlphaKey(0.2f, 0.5f),
-			new GradientAlphaKey(0.2f, 1.0f)
-		},
-		colorKeys = new GradientColorKey[] {
-			new GradientColorKey(new Color32(025, 040, 065, 255), 0.0f),
-			new GradientColorKey(new Color32(025, 040, 065, 255), 0.5f),
-			new GradientColorKey(new Color32(025, 040, 065, 255), 1.0f)
-		}
-	};
+	public Gradient RayColor = null;
 
 	/// Color of the light that hits the atmosphere.
 	/// Left value: Sun at horizon.
 	/// Right value: Sun opposite to zenith.
 	[Tooltip("Color of the light that hits the atmosphere.\nLeft value: Sun at horizon.\nRight value: Sun opposite to zenith.")]
-	public Gradient SkyColor = new Gradient()
-	{
-		alphaKeys = new GradientAlphaKey[] {
-			new GradientAlphaKey(1.0f, 0.0f),
-			new GradientAlphaKey(0.2f, 0.5f),
-			new GradientAlphaKey(0.2f, 1.0f)
-		},
-		colorKeys = new GradientColorKey[] {
-			new GradientColorKey(new Color32(025, 040, 065, 255), 0.0f),
-			new GradientColorKey(new Color32(025, 040, 065, 255), 0.5f),
-			new GradientColorKey(new Color32(025, 040, 065, 255), 1.0f)
-		}
-	};
+	public Gradient SkyColor = null;
 
 	/// Color of the clouds.
 	/// Left value: Sun at horizon.
 	/// Right value: Sun opposite to zenith.
 	[Tooltip("Color of the clouds.\nLeft value: Sun at horizon.\nRight value: Sun opposite to zenith.")]
-	public Gradient CloudColor = new Gradient()
-	{
-		alphaKeys = new GradientAlphaKey[] {
-			new GradientAlphaKey(1.0f, 0.0f),
-			new GradientAlphaKey(0.1f, 0.5f),
-			new GradientAlphaKey(0.1f, 1.0f)
-			},
-		colorKeys = new GradientColorKey[] {
-			new GradientColorKey(new Color32(025, 040, 065, 255), 0.0f),
-			new GradientColorKey(new Color32(025, 040, 065, 255), 0.5f),
-			new GradientColorKey(new Color32(025, 040, 065, 255), 1.0f)
-		}
-	};
+	public Gradient CloudColor = null;
 
 	/// Color of the atmosphere fog.
 	/// Left value: Sun at horizon.
 	/// Right value: Sun opposite to zenith.
 	[Tooltip("Color of the atmosphere fog.\nLeft value: Sun at horizon.\nRight value: Sun opposite to zenith.")]
-	public Gradient FogColor = new Gradient()
-	{
-		alphaKeys = new GradientAlphaKey[] {
-			new GradientAlphaKey(1.0f, 0.0f),
-			new GradientAlphaKey(0.2f, 0.5f),
-			new GradientAlphaKey(0.2f, 1.0f)
-		},
-		colorKeys = new GradientColorKey[] {
-			new GradientColorKey(new Color32(025, 040, 065, 255), 0.0f),
-			new GradientColorKey(new Color32(025, 040, 065, 255), 0.5f),
-			new GradientColorKey(new Color32(025, 040, 065, 255), 1.0f)
-		}
-	};
+	public Gradient FogColor = null;
 
 	/// Color of the ambient light.
 	/// Left value: Sun at horizon.
 	/// Right value: Sun opposite to zenith.
 	[Tooltip("Color of the ambient light.\nLeft value: Sun at horizon.\nRight value: Sun opposite to zenith.")]
-	public Gradient AmbientColor = new Gradient()
-	{
-		alphaKeys = new GradientAlphaKey[] {
-			new GradientAlphaKey(1.0f, 0.0f),
-			new GradientAlphaKey(0.2f, 0.5f),
-			new GradientAlphaKey(0.2f, 1.0f)
-		},
-		colorKeys = new GradientColorKey[] {
-			new GradientColorKey(new Color32(025, 040, 065, 255), 0.0f),
-			new GradientColorKey(new Color32(025, 040, 065, 255), 0.5f),
-			new GradientColorKey(new Color32(025, 040, 065, 255), 1.0f)
-		}
-	};
+	public Gradient AmbientColor = null;
 
 	/// [0, 8]
 	/// Intensity of the light source.
 	[Tooltip("Intensity of the light source.")]
-	[Range(0f, 1f)] public float LightIntensity = 0.1f;
+	[Range(0f, 8f)] public float LightIntensity = 0.1f;
 
 	/// [0, 1]
 	/// Opacity of the shadows dropped by the light source.
@@ -469,7 +301,7 @@ using System;
 	/// [0, 1]
 	/// Brightness multiplier of the ambient light.
 	[Tooltip("Brightness multiplier of the ambient light.")]
-	[Range(0f, 1f)] public float AmbientMultiplier = 1.0f;
+	[Range(0f, 8f)] public float AmbientMultiplier = 1.0f;
 
 	/// [0, 1]
 	/// Brightness multiplier of the reflection probe.
@@ -569,12 +401,17 @@ using System;
 	/// [0, 1]
 	/// How much sky is covered by clouds.
 	[Tooltip("How much sky is covered by clouds.")]
-	[TOD_Range(0f, 1f)] public float Coverage = 0.3f;
+	[TOD_Range(0f, 1f)] public float Coverage = 0.5f;
 
 	/// [0, 1]
 	/// Sharpness of the cloud to sky transition.
 	[Tooltip("Sharpness of the cloud to sky transition.")]
 	[TOD_Range(0f, 1f)] public float Sharpness = 0.5f;
+
+	/// [0, 1]
+	/// Coloring of the clouds.
+	[Tooltip("Coloring of the clouds.")]
+	[TOD_Range(0f, 1f)] public float Coloring = 0.5f;
 
 	/// [0, 1]
 	/// Amount of skylight that is blocked.
@@ -623,7 +460,7 @@ using System;
 {
 	/// Fog color mode.
 	[Tooltip("Fog color mode.")]
-	public TOD_FogType Mode = TOD_FogType.Color;
+	public TOD_FogType Mode = TOD_FogType.Atmosphere;
 
 	/// [0, 1]
 	/// Fog color sampling height.
@@ -658,8 +495,6 @@ using System;
 	[Tooltip("Reflection probe mode.")]
 	public TOD_ReflectionType Mode = TOD_ReflectionType.None;
 
-	#if !UNITY_4
-
 	/// Clear flags to use for the reflection.
 	[Tooltip("Clear flags to use for the reflection.")]
 	public ReflectionProbeClearFlags ClearFlags = ReflectionProbeClearFlags.Skybox;
@@ -672,7 +507,9 @@ using System;
 	[Tooltip("Time slicing behaviour to spread out rendering cost over multiple frames.")]
 	public ReflectionProbeTimeSlicingMode TimeSlicing = ReflectionProbeTimeSlicingMode.AllFacesAtOnce;
 
-	#endif
+	/// Resolution of the reflection bake.
+	[Tooltip("Resolution of the reflection bake.")]
+	[TOD_Range(16, 2048)] public int Resolution = 128;
 
 	/// Refresh interval of the reflection cubemap in seconds.
 	[Tooltip("Refresh interval of the reflection cubemap in seconds.")]

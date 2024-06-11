@@ -31,6 +31,9 @@ public class TOD_Time : MonoBehaviour
 	[Tooltip("Time progression curve.")]
 	public AnimationCurve TimeCurve = AnimationCurve.Linear(0, 0, 24, 24);
 
+	/// Fired whenever the second value is incremented.
+	public event Action OnSecond;
+
 	/// Fired whenever the minute value is incremented.
 	public event Action OnMinute;
 
@@ -110,6 +113,7 @@ public class TOD_Time : MonoBehaviour
 			if (OnDay    != null) OnDay();
 			if (OnHour   != null) OnHour();
 			if (OnMinute != null) OnMinute();
+			if (OnSecond != null) OnSecond();
 		}
 		else if (dateTimeNew.Month > dateTimeOld.Month)
 		{
@@ -117,21 +121,29 @@ public class TOD_Time : MonoBehaviour
 			if (OnDay    != null) OnDay();
 			if (OnHour   != null) OnHour();
 			if (OnMinute != null) OnMinute();
+			if (OnSecond != null) OnSecond();
 		}
 		else if (dateTimeNew.Day > dateTimeOld.Day)
 		{
 			if (OnDay    != null) OnDay();
 			if (OnHour   != null) OnHour();
 			if (OnMinute != null) OnMinute();
+			if (OnSecond != null) OnSecond();
 		}
 		else if (dateTimeNew.Hour > dateTimeOld.Hour)
 		{
 			if (OnHour   != null) OnHour();
 			if (OnMinute != null) OnMinute();
+			if (OnSecond != null) OnSecond();
 		}
 		else if (dateTimeNew.Minute > dateTimeOld.Minute)
 		{
 			if (OnMinute != null) OnMinute();
+			if (OnSecond != null) OnSecond();
+		}
+		else if (dateTimeNew.Second > dateTimeOld.Second)
+		{
+			if (OnSecond != null) OnSecond();
 		}
 
 		double oldHour = dateTimeOld.TimeOfDay.TotalHours;
@@ -228,7 +240,7 @@ public class TOD_Time : MonoBehaviour
 
 			float timeFactor = oneDayInMinutes / DayLengthInMinutes;
 
-			AddSeconds(Time.deltaTime * timeFactor);
+			AddSeconds(Time.fixedDeltaTime * timeFactor);
 		}
 	}
 }

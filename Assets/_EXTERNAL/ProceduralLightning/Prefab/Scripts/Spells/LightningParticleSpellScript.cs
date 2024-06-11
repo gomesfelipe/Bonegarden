@@ -1,66 +1,65 @@
-﻿//
+//
 // Procedural Lightning for Unity
 // (c) 2015 Digital Ruby, LLC
 // Source code may be used for personal or commercial projects.
 // Source code may NOT be redistributed or sold.
 // 
 
-#if UNITY_4_0 || UNITY_4_1 || UNITY_4_2 || UNITY_4_3 || UNITY_4_4 || UNITY_4_5 || UNITY_4_6 || UNITY_4_7 || UNITY_4_8 || UNITY_4_9
-
-#define UNITY_4
-
-#endif
-
-using UnityEngine;
-
 using System.Collections;
 using System.Collections.Generic;
 
+using UnityEngine;
+
 namespace DigitalRuby.ThunderAndLightning
 {
+    /// <summary>
+    /// Lightning bolt spell that uses a particle system
+    /// </summary>
     public class LightningParticleSpellScript : LightningSpellScript, ICollisionHandler
     {
+        /// <summary>
+        /// Particle system
+        /// </summary>
         [Header("Particle system")]
         public ParticleSystem ParticleSystem;
 
+        /// <summary>Particle system collision interval. This time must elapse before another collision will be registered.</summary>
         [Tooltip("Particle system collision interval. This time must elapse before another collision will be registered.")]
         public float CollisionInterval = 0.0f;
+
+        /// <summary>
+        /// Collision time remaining
+        /// </summary>
         protected float collisionTimer;
-
-#if UNITY_4
-
-		/// <summary>
-		/// Particle system callback. Parameters are game object, collision events, and number of collision events
-		/// </summary>
-		[HideInInspector]
-		public System.Action<GameObject, ParticleSystem.CollisionEvent[]> CollisionCallback;
-
-#else
 
         /// <summary>
         /// Particle system callback. Parameters are game object, collision events, and number of collision events
         /// </summary>
         [HideInInspector]
-        public System.Action<GameObject, ParticleCollisionEvent[], int> CollisionCallback;
+        public System.Action<GameObject, List<ParticleCollisionEvent>, int> CollisionCallback;
 
-#endif
-
+        /// <summary>Whether to enable point lights for the particles</summary>
         [Header("Particle Light Properties")]
         [Tooltip("Whether to enable point lights for the particles")]
         public bool EnableParticleLights = true;
 
+        /// <summary>Possible range of colors for particle lights</summary>
         [SingleLineClamp("Possible range for particle lights", 0.001, 100.0f)]
         public RangeOfFloats ParticleLightRange = new RangeOfFloats { Minimum = 2.0f, Maximum = 5.0f };
 
+        /// <summary>Possible range of intensity for particle lights</summary>
         [SingleLineClamp("Possible range of intensity for particle lights", 0.01f, 8.0f)]
         public RangeOfFloats ParticleLightIntensity = new RangeOfFloats { Minimum = 0.2f, Maximum = 0.3f };
 
+        /// <summary>Possible range of colors for particle lights</summary>
         [Tooltip("Possible range of colors for particle lights")]
         public Color ParticleLightColor1 = Color.white;
 
+        /// <summary>Possible range of colors for particle lights</summary>
         [Tooltip("Possible range of colors for particle lights")]
         public Color ParticleLightColor2 = Color.white;
 
+        /// <summary>The culling mask for particle lights</summary>
         [Tooltip("The culling mask for particle lights")]
         public LayerMask ParticleLightCullingMask = -1;
 
@@ -69,15 +68,7 @@ namespace DigitalRuby.ThunderAndLightning
 
         private void PopulateParticleLight(Light src)
         {
-
-#if UNITY_4
-
-#else
-
 			src.bounceIntensity = 0.0f;
-
-#endif
-
             src.type = LightType.Point;
             src.shadows = LightShadows.None;
             src.color = new Color
@@ -119,25 +110,8 @@ namespace DigitalRuby.ThunderAndLightning
             }
         }
 
-        protected override void OnDestroy()
+        private void UpdateParticleSystems()
         {
-            base.OnDestroy();
-
-            foreach (GameObject l in particleLights)
-            {
-                GameObject.Destroy(l);
-            }
-        }
-
-        protected override void Start()
-        {
-            base.Start();
-        }
-
-        protected override void Update()
-        {
-            base.Update();
-
             if (EmissionParticleSystem != null && EmissionParticleSystem.isPlaying)
             {
                 EmissionParticleSystem.transform.position = SpellStart.transform.position;
@@ -152,17 +126,55 @@ namespace DigitalRuby.ThunderAndLightning
                 }
                 UpdateParticleLights();
             }
-            collisionTimer -= Time.deltaTime;
         }
 
+        /// <summary>
+        /// OnDestroy
+        /// </summary>
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+
+            foreach (GameObject l in particleLights)
+            {
+                GameObject.Destroy(l);
+            }
+        }
+
+        /// <summary>
+        /// Start
+        /// </summary>
+        protected override void Start()
+        {
+            base.Start();
+        }
+
+        /// <summary>
+        /// Update
+        /// </summary>
+        protected override void Update()
+        {
+            base.Update();
+
+            UpdateParticleSystems();
+            collisionTimer -= LightningBoltScript.DeltaTime;
+        }
+
+        /// <summary>
+        /// Fires when spell is cast
+        /// </summary>
         protected override void OnCastSpell()
         {
             if (ParticleSystem != null)
             {
                 ParticleSystem.Play();
+                UpdateParticleSystems();
             }
         }
 
+        /// <summary>
+        /// Fires when spell is stopped
+        /// </summary>
         protected override void OnStopSpell()
         {
             if (ParticleSystem != null)
@@ -171,37 +183,13 @@ namespace DigitalRuby.ThunderAndLightning
             }
         }
 
-#if UNITY_4
-
-		/// <summary>
-		/// Handle a particle collision. Derived classes can override to provide custom logic.
-		/// </summary>
-		/// <param name="obj">Game Object</param>
-		/// <param name="collisions">Collisions</param>
-		/// <param name="numCollisions">Number of collisions</param>
-		void ICollisionHandler.HandleCollision(GameObject obj, ParticleSystem.CollisionEvent[] collisions, int numCollisions)
-		{
-			if (collisionTimer <= 0.0f)
-			{
-				collisionTimer = CollisionInterval;
-				PlayCollisionSound(collisions[0].intersection);
-				ApplyCollisionForce(collisions[0].intersection);
-				if (CollisionCallback != null)
-				{
-					CollisionCallback(obj, collisions);
-				}
-			}
-		}
-
-#else
-
         /// <summary>
         /// Handle a particle collision. Derived classes can override to provide custom logic.
         /// </summary>
         /// <param name="obj">Game Object</param>
         /// <param name="collisions">Collisions</param>
         /// <param name="collisionCount">Number of collisions</param>
-        void ICollisionHandler.HandleCollision(GameObject obj, ParticleCollisionEvent[] collisions, int collisionCount)
+        void ICollisionHandler.HandleCollision(GameObject obj, List<ParticleCollisionEvent> collisions, int collisionCount)
         {
             if (collisionTimer <= 0.0f)
             {
@@ -214,8 +202,5 @@ namespace DigitalRuby.ThunderAndLightning
                 }
             }
         }
-
-#endif
-
     }
 }

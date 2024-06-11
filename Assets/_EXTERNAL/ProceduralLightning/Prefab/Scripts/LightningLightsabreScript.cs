@@ -1,23 +1,31 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 
 namespace DigitalRuby.ThunderAndLightning
 {
+    /// <summary>
+    /// Lightning bolt script that acts like a laser sword
+    /// </summary>
     public class LightningLightsabreScript : LightningBoltPrefabScript
     {
+        /// <summary>Height of the blade</summary>
         [Header("Lightsabre Properties")]
         [Tooltip("Height of the blade")]
         public float BladeHeight = 19.0f;
 
+        /// <summary>How long it takes to turn the lightsabre on and off</summary>
         [Tooltip("How long it takes to turn the lightsabre on and off")]
         public float ActivationTime = 0.5f;
 
+        /// <summary>Sound to play when the lightsabre turns on</summary>
         [Tooltip("Sound to play when the lightsabre turns on")]
         public AudioSource StartSound;
 
+        /// <summary>Sound to play when the lightsabre turns off</summary>
         [Tooltip("Sound to play when the lightsabre turns off")]
         public AudioSource StopSound;
 
+        /// <summary>Sound to play when the lightsabre stays on</summary>
         [Tooltip("Sound to play when the lightsabre stays on")]
         public AudioSource ConstantSound;
 
@@ -27,16 +35,22 @@ namespace DigitalRuby.ThunderAndLightning
         private float bladeTime;
         private float bladeIntensity;
 
+        /// <summary>
+        /// Start
+        /// </summary>
         protected override void Start()
         {
             base.Start();
         }
 
+        /// <summary>
+        /// Update
+        /// </summary>
         protected override void Update()
         {
             if (state == 2 || state == 3)
             {
-                bladeTime += Time.deltaTime;
+                bladeTime += LightningBoltScript.DeltaTime;
                 float percent = Mathf.Lerp(0.01f, 1.0f, bladeTime / ActivationTime);
                 Vector3 end = bladeStart + (bladeDir * percent * BladeHeight);
                 Destination.transform.position = end;

@@ -1,4 +1,4 @@
-﻿//
+//
 // Procedural Lightning for Unity
 // (c) 2015 Digital Ruby, LLC
 // Source code may be used for personal or commercial projects.
@@ -14,11 +14,16 @@ using System.Collections.Generic;
 
 namespace DigitalRuby.ThunderAndLightning
 {
+    /// <summary>
+    /// Base lghtning bolt path script
+    /// </summary>
     public abstract class LightningBoltPathScriptBase : LightningBoltPrefabScriptBase
     {
+        /// <summary>The game objects to follow for the lightning path</summary>
         [Header("Lightning Path Properties")]
-        [ReorderableListAttribute("The game objects to follow for the lightning path")]
-        public ReorderableList_GameObject LightningPath;
+        [Tooltip("The game objects to follow for the lightning path")]
+        public List<GameObject> LightningPath;
+        private readonly List<GameObject> currentPathObjects = new List<GameObject>();
 
 #if UNITY_EDITOR
 
@@ -56,15 +61,23 @@ namespace DigitalRuby.ThunderAndLightning
             }
         }
 
+        /// <summary>
+        /// OnDrawGizmos
+        /// </summary>
         protected override void OnDrawGizmos()
         {
             base.OnDrawGizmos();
 
             DoGizmoCleanup();
 
+            if (HideGizmos)
+            {
+                return;
+            }
+
 #if SHOW_LIGHTNING_PATH
 
-            bool noLightningPath = (LightningPath == null || LightningPath.List == null || LightningPath.List.Count == 0);
+            bool noLightningPath = (LightningPath == null || LightningPath.Count == 0);
 
 #else
 
@@ -75,11 +88,15 @@ namespace DigitalRuby.ThunderAndLightning
             // remove any objects that were taken out of the list and cleanup the gizmo script
             for (int i = lastGizmos.Count - 1; i >= 0; i--)
             {
-                if (noLightningPath || !LightningPath.List.Contains(lastGizmos[i]))
+                if (noLightningPath || !LightningPath.Contains(lastGizmos[i]))
                 {
                     if (lastGizmos[i] != null)
                     {
-                        GameObject.DestroyImmediate(lastGizmos[i].GetComponent<LightningGizmoScript>(), true);
+                        LightningGizmoScript s = lastGizmos[i].GetComponent<LightningGizmoScript>();
+                        if (s != null)
+                        {
+                            GameObject.DestroyImmediate(s, true);
+                        }
                     }
                     lastGizmos.RemoveAt(i);
                 }
@@ -98,10 +115,10 @@ namespace DigitalRuby.ThunderAndLightning
             LightningGizmoScript gizmoScript;
             lastGizmos.Clear();
 
-            for (int index = 0; index < LightningPath.List.Count; index++)
+            for (int index = 0; index < LightningPath.Count; index++)
             {
-                GameObject o = LightningPath.List[index];
-                if (o == null)
+                GameObject o = LightningPath[index];
+                if (o == null || !o.activeInHierarchy)
                 {
                     continue;
                 }
@@ -121,6 +138,7 @@ namespace DigitalRuby.ThunderAndLightning
                 {
                     gizmoScript.Label += ", " + index.ToString();
                 }
+                gizmoScript.LightningBoltScript = this;
 
                 gizmoPosition = o.transform.position;
                 if (previousPoint != null && previousPoint.Value != gizmoPosition)
@@ -129,8 +147,8 @@ namespace DigitalRuby.ThunderAndLightning
                     Gizmos.DrawLine(previousPoint.Value, gizmoPosition);
                     Vector3 direction = (gizmoPosition - previousPoint.Value);
                     Vector3 center = (previousPoint.Value + gizmoPosition) * 0.5f;
-                    float arrowSize = Mathf.Min(1.0f, direction.magnitude);
-                    UnityEditor.Handles.ArrowCap(0, center, Quaternion.LookRotation(direction), arrowSize);
+                    float arrowSize = Mathf.Min(1.0f, direction.magnitude) * 2.0f;
+                    UnityEditor.Handles.ArrowHandleCap(0, center, Quaternion.LookRotation(direction), arrowSize, EventType.Repaint);
                 }
 
                 previousPoint = gizmoPosition;
@@ -140,20 +158,57 @@ namespace DigitalRuby.ThunderAndLightning
 
 #endif
 
+        /// <summary>
+        /// Get the game objects in the path currently - null or inactive objects are not returned
+        /// </summary>
+        /// <returns>List of game objects in the path</returns>
+        protected List<GameObject> GetCurrentPathObjects()
+        {
+            currentPathObjects.Clear();
+            if (LightningPath != null)
+            {
+                foreach (GameObject obj in LightningPath)
+                {
+                    if (obj != null && obj.activeInHierarchy)
+                    {
+                        currentPathObjects.Add(obj);
+                    }
+                }
+            }
+            return currentPathObjects;
         }
 
+        /// <summary>
+        /// Create lightning bolt path parameters
+        /// </summary>
+        /// <returns>Lightning bolt path parameters</returns>
+        protected override LightningBoltParameters OnCreateParameters()
+        {
+            LightningBoltParameters p = base.OnCreateParameters();
+            p.Generator = LightningGeneratorPath.GeneratorInstance;
+            return p;
+        }
+    }
+
+    /// <summary>
+    /// Lightning bolt path script implementation
+    /// </summary>
     public class LightningBoltPathScript : LightningBoltPathScriptBase
     {
+        /// <summary>How fast the lightning moves through the points or objects. 1 is normal speed, 0.01 is slower, so the lightning will move slowly between the points or objects.</summary>
         [Tooltip("How fast the lightning moves through the points or objects. 1 is normal speed, " +
             "0.01 is slower, so the lightning will move slowly between the points or objects.")]
         [Range(0.01f, 1.0f)]
         public float Speed = 1.0f;
 
+        /// <summary>When each new point is moved to, this can provide a random value to make the movement to the next point appear more staggered or random. Leave as 1 and 1 to have constant speed. Use a higher maximum to create more randomness.</summary>
+        [Tooltip("Repeat when the path completes?")]
         [SingleLineClamp("When each new point is moved to, this can provide a random value to make the movement to " +
             "the next point appear more staggered or random. Leave as 1 and 1 to have constant speed. Use a higher " +
             "maximum to create more randomness.", 1.0, 500.0)]
         public RangeOfFloats SpeedIntervalRange = new RangeOfFloats { Minimum = 1.0f, Maximum = 1.0f };
 
+        /// <summary>Repeat when the path completes?</summary>
         [Tooltip("Repeat when the path completes?")]
         public bool Repeat = true;
 
@@ -161,12 +216,16 @@ namespace DigitalRuby.ThunderAndLightning
         private int nextIndex;
         private Vector3? lastPoint;
 
+        /// <summary>
+        /// Create a lightning bolt
+        /// </summary>
+        /// <param name="parameters">Parameters</param>
         public override void CreateLightningBolt(LightningBoltParameters parameters)
         {
             Vector3? currentPoint = null;
-            List<GameObject> lightningPath = (LightningPath == null ? null : LightningPath.List);
+            List<GameObject> lightningPath = GetCurrentPathObjects();
 
-            if (lightningPath == null || lightningPath.Count < 2)
+            if (lightningPath.Count < 2)
             {
                 return;
             }
@@ -214,6 +273,9 @@ namespace DigitalRuby.ThunderAndLightning
             }
         }
 
+        /// <summary>
+        /// Reset everything
+        /// </summary>
         public void Reset()
         {
             lastPoint = null;

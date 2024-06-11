@@ -1,4 +1,4 @@
-﻿//
+//
 // Procedural Lightning for Unity
 // (c) 2015 Digital Ruby, LLC
 // Source code may be used for personal or commercial projects.
@@ -10,12 +10,17 @@ using System.Collections;
 
 namespace DigitalRuby.ThunderAndLightning
 {
+    /// <summary>
+    /// Lightning bolt beam spell script, like a phasor or laser
+    /// </summary>
     public class LightningBeamSpellScript : LightningSpellScript
     {
+        /// <summary>The lightning path script creating the beam of lightning</summary>
         [Header("Beam")]
         [Tooltip("The lightning path script creating the beam of lightning")]
         public LightningBoltPathScriptBase LightningPathScript;
 
+        /// <summary>Give the end point some randomization</summary>
         [Tooltip("Give the end point some randomization")]
         public float EndPointRandomization = 1.5f;
 
@@ -72,6 +77,9 @@ namespace DigitalRuby.ThunderAndLightning
             }
         }
 
+        /// <summary>
+        /// Start
+        /// </summary>
         protected override void Start()
         {
             base.Start();
@@ -79,9 +87,12 @@ namespace DigitalRuby.ThunderAndLightning
             LightningPathScript.ManualMode = true;
         }
 
-        protected override void Update()
+        /// <summary>
+        /// Update
+        /// </summary>
+        protected override void LateUpdate()
         {
-            base.Update();
+            base.LateUpdate();
 
             if (!Casting)
             {
@@ -91,11 +102,17 @@ namespace DigitalRuby.ThunderAndLightning
             CheckCollision();
         }
 
+        /// <summary>
+        /// OnCastSpell
+        /// </summary>
         protected override void OnCastSpell()
         {
             LightningPathScript.ManualMode = false;
         }
 
+        /// <summary>
+        /// OnStopSpell
+        /// </summary>
         protected override void OnStopSpell()
         {
             LightningPathScript.ManualMode = true;

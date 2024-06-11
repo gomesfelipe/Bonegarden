@@ -1,4 +1,4 @@
-﻿//
+//
 // Procedural Lightning for Unity
 // (c) 2015 Digital Ruby, LLC
 // Source code may be used for personal or commercial projects.
@@ -10,10 +10,20 @@ using System.Collections;
 
 namespace DigitalRuby.ThunderAndLightning
 {
+    /// <summary>
+    /// Lightning whip script
+    /// </summary>
     [RequireComponent(typeof(AudioSource))]
     public class LightningWhipScript : MonoBehaviour
     {
+        /// <summary>
+        /// Whip crack sound
+        /// </summary>
         public AudioClip WhipCrack;
+
+        /// <summary>
+        /// Whip crack thunder sound
+        /// </summary>
         public AudioClip WhipCrackThunder;
 
         private AudioSource audioSource;
@@ -51,15 +61,15 @@ namespace DigitalRuby.ThunderAndLightning
                 whipSpring.GetComponent<Rigidbody2D>().position = whipHandle.GetComponent<Rigidbody2D>().position + new Vector2(-15.0f, 5.0f);
 
                 // wait a bit
-                yield return new WaitForSeconds(0.2f);
+                yield return WaitForSecondsLightning.WaitForSecondsLightningPooled(0.2f);
 
                 // now put the spring in front of the whip to pull it forward
                 whipSpring.GetComponent<Rigidbody2D>().position = whipHandle.GetComponent<Rigidbody2D>().position + new Vector2(15.0f, 2.5f);
-                yield return new WaitForSeconds(0.15f);
+                yield return WaitForSecondsLightning.WaitForSecondsLightningPooled(0.15f);
                 audioSource.PlayOneShot(WhipCrackThunder, 0.5f);
 
                 // wait a bit
-                yield return new WaitForSeconds(0.15f);
+                yield return WaitForSecondsLightning.WaitForSecondsLightningPooled(0.15f);
 
                 // show the strike paticle system
                 whipEndStrike.GetComponent<ParticleSystem>().Play();
@@ -68,7 +78,7 @@ namespace DigitalRuby.ThunderAndLightning
                 whipSpring.GetComponent<SpringJoint2D>().enabled = false;
 
                 // wait a bit longer for the whip to recoil
-                yield return new WaitForSeconds(0.65f);
+                yield return WaitForSecondsLightning.WaitForSecondsLightningPooled(0.65f);
 
                 // put the drag back on
                 for (int i = 0; i < whipStart.transform.childCount; i++)

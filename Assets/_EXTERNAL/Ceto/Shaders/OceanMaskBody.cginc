@@ -1,3 +1,5 @@
+// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+
 #ifndef CETO_MASK_BODY_INCLUDED
 #define CETO_MASK_BODY_INCLUDED
 
@@ -21,7 +23,7 @@ v2f OceanVertMask(appdata_base v)
 
 	v2f o;
 
-	o.pos = mul(UNITY_MATRIX_MVP, v.vertex);
+	o.pos = UnityObjectToClipPos(v.vertex);
 	o.worldPos = v.vertex.xyz;
 	o.depth = COMPUTE_DEPTH_01;
 

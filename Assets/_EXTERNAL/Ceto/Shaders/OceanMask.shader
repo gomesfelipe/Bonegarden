@@ -1,4 +1,6 @@
-﻿
+﻿// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+
+
 
 Shader "Ceto/OceanMask" 
 {
@@ -94,7 +96,7 @@ Shader "Ceto/OceanMask"
 			v2f vert(appdata_base v)
 			{
 				v2f o;
-				o.pos = mul(UNITY_MATRIX_MVP, v.vertex);
+				o.pos = UnityObjectToClipPos(v.vertex);
 				o.depth = COMPUTE_DEPTH_01;
 				
 				return o;

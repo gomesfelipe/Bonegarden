@@ -175,8 +175,8 @@ public partial class TOD_Sky : MonoBehaviour
 				float lha_rad = Mathf.Acos(lha_cos);
 				float lha_deg = Mathf.Rad2Deg * lha_rad;
 
-				SunsetTime  = (24f + ((ut_deg + lha_deg) / 15f) % 24f) % 24f;
-				SunriseTime = (24f + ((ut_deg - lha_deg) / 15f) % 24f) % 24f;
+				SunsetTime  = (24f + ((ut_deg + lha_deg) / 15f + World.UTC) % 24f) % 24f;
+				SunriseTime = (24f + ((ut_deg - lha_deg) / 15f + World.UTC) % 24f) % 24f;
 			}
 
 			// Sun position
@@ -216,7 +216,7 @@ public partial class TOD_Sky : MonoBehaviour
 				float ze = ys * ecl_sin;
 
 				float rasc_rad = Mathf.Atan2(ye, xe);
-				float decl_rad = Mathf.Atan2(ze, Mathf.Sqrt(xe*xe + ye*ye));
+				float decl_rad = Mathf.Atan2(ze, Mathf.Sqrt(xe * xe + ye * ye));
 				float decl_sin = Mathf.Sin(decl_rad);
 				float decl_cos = Mathf.Cos(decl_rad);
 
@@ -246,7 +246,7 @@ public partial class TOD_Sky : MonoBehaviour
 				float zhor = x * lat_cos + z * lat_sin;
 
 				float azimuth  = Mathf.Atan2(yhor, xhor) + Mathf.Deg2Rad * 180f;
-				float altitude = Mathf.Atan2(zhor, Mathf.Sqrt(xhor*xhor + yhor*yhor));
+				float altitude = Mathf.Atan2(zhor, Mathf.Sqrt(xhor * xhor + yhor * yhor));
 
 				sun_zenith_rad   = horizon_rad - altitude;
 				sun_altitude_rad = altitude;
@@ -317,7 +317,7 @@ public partial class TOD_Sky : MonoBehaviour
 				float ze = yg * ecl_sin + zg * ecl_cos;
 
 				float rasc_rad = Mathf.Atan2(ye, xe);
-				float decl_rad = Mathf.Atan2(ze, Mathf.Sqrt(xe*xe + ye*ye));
+				float decl_rad = Mathf.Atan2(ze, Mathf.Sqrt(xe * xe + ye * ye));
 				float decl_sin = Mathf.Sin(decl_rad);
 				float decl_cos = Mathf.Cos(decl_rad);
 
@@ -336,7 +336,7 @@ public partial class TOD_Sky : MonoBehaviour
 				float zhor = x * lat_cos + z * lat_sin;
 
 				float azimuth  = Mathf.Atan2(yhor, xhor) + Mathf.Deg2Rad * 180f;
-				float altitude = Mathf.Atan2(zhor, Mathf.Sqrt(xhor*xhor + yhor*yhor));
+				float altitude = Mathf.Atan2(zhor, Mathf.Sqrt(xhor * xhor + yhor * yhor));
 
 				moon_zenith_rad   = horizon_rad - altitude;
 				moon_altitude_rad = altitude;
@@ -356,7 +356,7 @@ public partial class TOD_Sky : MonoBehaviour
 
 		// Transform updates
 		{
-			Quaternion spaceRot = Quaternion.Euler(90 - World.Latitude, 0, 0) * Quaternion.Euler(0, World.Longitude, 0) * Quaternion.Euler(0, lst_rad * Mathf.Rad2Deg, 0);
+			Quaternion spaceRot = Quaternion.Euler(90 - World.Latitude, 0, 0) * Quaternion.Euler(0, 180 + lst_rad * Mathf.Rad2Deg, 0);
 
 			if (Stars.Position == TOD_StarsPositionType.Rotating)
 			{
@@ -475,7 +475,7 @@ public partial class TOD_Sky : MonoBehaviour
 				Components.AtmosphereRenderer.enabled = atmoEnabled;
 			}
 
-			bool clearEnabled = (Components.Rays != null);
+			bool clearEnabled = false;
 
 			#if UNITY_EDITOR
 			if (Components.ClearRenderer.enabled != clearEnabled)
@@ -535,7 +535,7 @@ public partial class TOD_Sky : MonoBehaviour
 			SunCloudColor  = TOD_Util.ApplyAlpha(Day.CloudColor.Evaluate(dayTime));
 			MoonCloudColor = TOD_Util.ApplyAlpha(Night.CloudColor.Evaluate(nightTime));
 
-			// FOg color
+			// Fog color
 			Color dayFogColor   = TOD_Util.ApplyAlpha(Day.FogColor.Evaluate(dayTime));
 			Color nightFogColor = TOD_Util.ApplyAlpha(Night.FogColor.Evaluate(nightTime));
 			FogColor = Color.Lerp(nightFogColor, dayFogColor, LerpValue);
@@ -612,9 +612,6 @@ public partial class TOD_Sky : MonoBehaviour
 			{
 				Components.LightTransform.localPosition = position;
 				Components.LightTransform.LookAt(Components.DomeTransform.position);
-                Vector3 oldRotation = Components.LightTransform.localRotation.eulerAngles;
-                oldRotation.x += 10f;
-                Components.LightTransform.localRotation = Quaternion.Euler(oldRotation);
 			}
 		}
 		else

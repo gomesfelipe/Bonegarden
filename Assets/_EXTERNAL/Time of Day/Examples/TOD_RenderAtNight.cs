@@ -1,19 +1,14 @@
 using UnityEngine;
 
-[RequireComponent(typeof(Renderer))]
-public class TOD_RenderAtNight : MonoBehaviour
+public class TOD_RenderAtNight : TOD_Render
 {
-	private Renderer rendererComponent;
-
 	protected void Start()
 	{
-		rendererComponent = GetComponent<Renderer>();
-
-		rendererComponent.enabled = TOD_Sky.Instance.IsNight;
+		SetState(TOD_Sky.Instance.IsNight);
 	}
 
 	protected void Update()
 	{
-		rendererComponent.enabled = TOD_Sky.Instance.IsNight;
+		SetState(TOD_Sky.Instance.IsNight);
 	}
 }

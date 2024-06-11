@@ -1,4 +1,4 @@
-// Amplify Color - Advanced Color Grading for Unity Pro
+// Amplify Color - Advanced Color Grading for Unity
 // Copyright (c) Amplify Creations, Lda <info@amplify.pt>
 
 using System;
@@ -36,7 +36,7 @@ namespace AmplifyColor
 				{
 					Texture2D luttexture = _cameraCollection.GetCurrentEffectTexture();
 
-					if ( _settings.ApplyLUT && luttexture != null )
+					if ( _settings.ApplyColorGrading && luttexture != null )
 					{
 						if ( !imageResult.AddLUTFromTexture( _settings.LUT, luttexture ) )
 						{
@@ -88,7 +88,10 @@ namespace AmplifyColor
 			LUTResult lutResult;
 
 			if ( ReadLUT( out lutResult ) )
+			{
 				_lutWriter.SaveLUT( lutResult );
+				lutResult.Release();
+			}
 		}
 
 		public bool ReadLUT( out LUTResult lutResult )

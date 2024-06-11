@@ -1,4 +1,4 @@
-// Amplify Color - Advanced Color Grading for Unity Pro
+// Amplify Color - Advanced Color Grading for Unity
 // Copyright (c) Amplify Creations, Lda <info@amplify.pt>
 
 using System;
@@ -10,10 +10,10 @@ namespace AmplifyColor
 	public class VersionInfo
 	{
 		public const byte Major = 1;
-		public const byte Minor = 4;
-		public const byte Release = 4;
+		public const byte Minor = 8;
+		public const byte Release = 2;
 
-		private static string StageSuffix = "_dev007";
+		private static string StageSuffix = "";
 
 	#if TRIAL
 		private static string TrialSuffix = " Trial";

@@ -1,4 +1,6 @@
-﻿// Upgrade NOTE: replaced '_Object2World' with 'unity_ObjectToWorld'
+﻿// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+
+// Upgrade NOTE: replaced '_Object2World' with 'unity_ObjectToWorld'
 
 Shader "psx/reflective/unlit_noambient-Add" {
 	Properties{
@@ -36,7 +38,7 @@ Shader "psx/reflective/unlit_noambient-Add" {
 		v2f o;
 
 		//Vertex snapping
-		float4 snapToPixel = mul(UNITY_MATRIX_MVP,v.vertex);
+		float4 snapToPixel = UnityObjectToClipPos(v.vertex);
 		float4 vertex = snapToPixel;
 		vertex.xyz = snapToPixel.xyz / snapToPixel.w;
 		vertex.x = floor(160 * vertex.x) / 160;

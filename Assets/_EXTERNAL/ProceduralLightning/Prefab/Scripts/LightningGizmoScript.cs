@@ -1,4 +1,4 @@
-﻿//
+//
 // Procedural Lightning for Unity
 // (c) 2015 Digital Ruby, LLC
 // Source code may be used for personal or commercial projects.
@@ -10,18 +10,30 @@ using System.Collections;
 
 namespace DigitalRuby.ThunderAndLightning
 {
+    /// <summary>
+    /// Draws lightning bolt script gizmos
+    /// </summary>
     public class LightningGizmoScript : MonoBehaviour
     {
 
 #if UNITY_EDITOR
 
+        /// <summary>
+        /// Label
+        /// </summary>
         public string Label { get; set; }
+
+        /// <summary>
+        /// Lightning bolt script
+        /// </summary>
+        public LightningBoltScript LightningBoltScript { get; set; }
+
         private static readonly Vector3 labelOffset = Vector3.up * 1.5f;
         private static GUIStyle style;
 
         private void OnDrawGizmos()
         {
-            if (Label == null)
+            if (Label == null || (LightningBoltScript != null && LightningBoltScript.HideGizmos))
             {
                 return;
             }

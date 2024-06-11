@@ -3,16 +3,12 @@ Procedural Lightning for Unity 3D
 http://www.digitalruby.com
 
 --------------------------------------------------
-Version 1.7.8
-Change Log is in ChangeLog.txt
+Version 2.7.4 - (See ChangeLog.txt for history)
 --------------------------------------------------
 
-**********************
-*UNITY 4 SPECIAL NOTE*
-I made everythning in Unity 5. Consequently, for Unity 4, there are no prefabs and you have to setup everything from scratch. It's very easy, but requires dragging script files on to an empty game object and setting up materials and textures. See the Getting Started tutorial.
-**********************
+Procedural Lightning Requires Unity 2019.4 or newer. Older Unity are no longer supported.
 
-Please read this entire file to get the most out of this asset.
+Please read this entire file to get the most out of this asset. To view water in the demo scenes, please import Standard Assets -> Environment.
 
 Procedural Lightning for Unity contains code to create 2D or 3D procedural lightning for use in your Unity game or app.
 
@@ -24,6 +20,8 @@ Spline Lightning: https://youtu.be/Od4AINfKE8k
 Light: https://youtu.be/Wv-bP0qua0o
 Turbulence and Jitter: https://youtu.be/g7ehEKRJwb4
 
+Code Documentation: https://unitydocs.digitalruby.com/
+
 Assets provided:
 
 - Demo Scenes: (/Demo/Scenes)
@@ -31,7 +29,9 @@ Assets provided:
 	- DemoScene2D - shows sort layers and sprites
 	- DemoScene2DXZ - shows orthographic mode using the XZ plane
 	- DemoSceneConfigurePrafab - easily setup a lightning bolt prefab in the designer view
+	- DemoSceneConfigurePrafabHDR - easily setup a lightning bolt prefab in the designer view for HDR
 	- DemoSceneConfigureScript - configure the lightning for use in scripting
+	- DemoSceneCustomTransform - shows how to rotate, scale and translate the lightning to track a start and end target for the lifetime of the bolt.
 	- DemoSceneLight - Shows how to setup the lightning to use lights
 	- DemoSceneLightningField - Shows the lightning field prefab in action
 	- DemoSceneLightsabre - Shows a lightsabre in action using the lightning for a blade
@@ -53,6 +53,7 @@ Assets provided:
 	- LightningBoltBasePrefab - The bare bones script without any extra scripting properties. You'll generally want LightningBoltPrefab for your game instead.
 	- LightningBoltPathPrefab - Use this to create lightning that travels through a list of points
 	- LightningBoltPrefab - This will be the prefab you use most of the time. Please see the getting started tutorial video (link at the top of this document) for full details.
+	- LightningBoltPrefabHDR - HDR prefab with nice glowing effect. Please see the getting started tutorial video (link at the top of this document) for full details.
 	- LightningBoltShapeConePrefab - Creates a cone of lightning
 	- LightningBoltShapeSpherePrefab - Creates a sphere of lightning
 	- LightningBoltSplinePrefab - Use this to create lightning that curves through a list of points smoothly
@@ -95,13 +96,28 @@ The possible parameters are:
 - Duration: The total time in seconds that the bolts will take to emite and dissipate. When sending out multiple bolts, each bolt will appear for a percentage of this time (about duration divided by count seconds).
 - Start Distance: This moves the source of the bolt closer or further away from the camera. For best results, keep this close to the end distance.
 - End Distance: This moves the end of the bolt closer or further away from the camera. For best results, keep this close to the start distance.
-- Chaos Factor: As this value is increased, the lightning bolts spread out more and become more chaotic and cover more distance. In my testing, 0.1 to 0.25 are good ranges.
+- Chaos Factor: As this value is increased, the lightning bolt main trunk spreads out more and become more chaotic and cover more distance. In my testing, 0.1 to 0.25 are good ranges.
+- Chaos Factor Forks: As this value is increased, the lightning bolt forks spread out more and become more chaotic and cover more distance. In my testing, 0.1 to 0.25 are good ranges.
 - Trunk Width: How wide the main trunk of the lightning bolt will be int Unity units.
 - Forkedness: How many forks or splits will your lightning bolt have? If this value is 0, none. If it is 1, lots!
+- Intensity: Add additional brightness to the structure of the lightning - useful in HDR only, leave as 1 otherwise.
 - Glow Intensity: How bright the glow of the lightning will be. Set to 0 to remove the glow.
 - Glow Width Multiplier: Spreads the glow out more. Set to 0 to remove the glow.
 - Fade Percent: 0.0 to 0.5, how long the lightning takes to fade in and out during it's lifetime (percent).
 - Growth multiplier: How slowly the lightning should grow, 0 for instant, 1 for slow (0 - 1).
+
+*Presets*
+Instead of scriptable objects, procedural lightning uses presets. You can apply these at runtime. You can apply or create presets by clicking the dials icon right next to the gear icon in the inspector.
+More details: https://docs.unity3d.com/ScriptReference/Presets.Preset.html
+
+*Performance*
+Lowering your generations can really improve performance. Every step up in generations is a squared order of increased computation.
+The lightning script QualitySetting parameter can be used to tie into the player quality setting, or to use the generations value from your script.
+Large trunk widths at close range can really bog down the GPU, so ensure your trunk width is as small as possible.
+You can also try turning on the MultiThreaded property on the lightning script. This will generate the lightning in a background thread, freeing your main thread for other tasks. Note that Unity does not yet support creating meshes in a background thread, so sadly this still has to be done on the foreground thread.
+Depending on your platform, background thread lightning creation might cause crashes or glitches, so turn it off if you see problems and email me at support@digitalruby.com.
+Vote for Unity adding background thread mesh creation here: https://feedback.unity3d.com/suggestions/read-slash-write-mesh-on-background-thread
+Set LevelOfDetailDistance to a value to lower the generations automatically as the lightning is further from the camera. Each amount of LevelOfDetailDistance the lightning is away from the camera, the generations are reduced automatically internally.
 
 *Positioning and scaling the lightning*
 LightningBoltParameters has a static Scale field that can globally change the scale of a few properties, such as trunk width.
@@ -129,7 +145,7 @@ LightningBoltScript.cs has a quality setting option. This can be:
 - Lightning lights, shadows and soft particles work best with Deferred rendering
 
 *Lighting*
-Lightning can emit lights. See the LightningLightParameters class, as well as the DemoScenePath for examples of how this works. Please review the light parameter documentation carefully as lighting can impact performance.
+Lightning can emit lights. See the LightningLightParameters class, as well as the DemoSceneLight for examples of how this works. Please review the light parameter documentation carefully as lighting can impact performance, especially in forward rendering.
 See LightningBoltScript.cs and the maxLightCount constant to determine how many lights lightning can generate at maximum. If you are using lights with an orthographic camera, they will have a z value set to the camera z position.
 
 *Spells*
@@ -147,6 +163,9 @@ If you need to make a spell, look at how the spell prefabs are done. Depending o
 
 The spells apply forces upon collision but there is no damage or other health altering system built in. To apply damage or other extra effects, you will need to hook into the collision callback of the spell script and do what is appropriate for your game.
 
+*Notifications*
+Set LightningStartedCallback and LightningEndedCallback on lightning bolt script to be notified when bolts are started and ended.
+
 *Orthographic Camera*
 Procedural lightning supports perspective cameras, but also supports orthographic cameras and even supports the XZ plane with an orthographic camera. Set the CameraRenderMode property of the script if needed. Auto usually works fine unless you need the XZ plane.
 
@@ -160,14 +179,18 @@ If you need to pool lightning objects or turn off the lightning, don't set activ
 - Lightning glow requires an extra pass in the shader, so you may want to disable this on lower end mobile devices by setting the glow intensity or the glow width to 0.
 - LightningBoltScript.cs, class LightningBolt has public static variables that control limits for lighting
 - LightningBoltScript contains a source and destination blend mode. This can be used to change from the additive shader (default) to other kinds of blending, like aplha blending.
+- Clear the cache by calling LightningBolt.ClearCache() - this is automatically called on scene load.
+
+*Troubleshooting*
+- Getting a "Can't destroy transform" error? This is a bug in Unity, just ignore it.
 
 *Credits*
 http://www.freesfx.co.uk
 
-Not everything may be covered in this readme and this asset contains a lot of options and code. If you are confused, have a question or need guidance, please contact me. I'm always happy to answer questions. Please email me at jeff@digitalruby.com and I'll be happy to assist you.
+Not everything may be covered in this readme and this asset contains a lot of options and code. If you are confused, have a question or need guidance, please contact me. I'm always happy to answer questions. Please email me at support@digitalruby.com and I'll be happy to assist you.
 
 Thanks for purchasing Procedural Lightning for Unity.
 
 - Jeff Johnson, CEO Digital Ruby, LLC
-jeff@digitalruby.com
+support@digitalruby.com
 http://www.digitalruby.com
